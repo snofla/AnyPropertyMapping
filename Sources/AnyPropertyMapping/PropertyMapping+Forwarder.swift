@@ -181,7 +181,7 @@ extension PropertyMapping {
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning non-optional to non-optional is always possible
-            _lhs[keyPath: self._realLeftKeyPath] = _rhs[keyPath: self._realRighKeyPath] ?? V()
+            _lhs[keyPath: self._realLeftKeyPath] = _rhs[keyPath: self._realRighKeyPath]
         }
         
         public func apply(from lhs: Any, to rhs:  Any) {
