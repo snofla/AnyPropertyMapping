@@ -90,18 +90,6 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
 
 extension PropertyMapping {
     
-    func adapt(to lhs: L, from rhs: R) {
-        fatalError("Never called")
-    }
-        
-    func apply(from lhs: L, to rhs: R) {
-        fatalError("Never called")
-    }
-    
-    func differs(_ lhs: L, _ rhs: R) -> Bool {
-        fatalError("Never called")
-    }
-    
     public func adapt(to lhs: Any, from rhs: Any) {
         switch self.forwarder {
         case .asIs(let forwarder):
@@ -139,16 +127,6 @@ extension PropertyMapping {
         case .both(let forwarder):
             return forwarder.differs(lhs, rhs)
         }
-    }
-    
-}
-
-
-extension PropertyMapping {
-    
-    static func testArguments(_ function: StaticString, _ lhs: Any, rhs: Any) {
-        assert(lhs is L, "\(function): Type of left-hand side should match with the left-hand side mapping argument")
-        assert(rhs is R, "\(function): Type of right-hand side shouuld match with the right-hand side mapping argument")
     }
     
 }
