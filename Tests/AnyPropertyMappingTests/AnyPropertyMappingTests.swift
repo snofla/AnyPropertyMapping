@@ -151,6 +151,158 @@ class AnyPropertyMappingTests: XCTestCase {
         XCTAssert(aaKeyPaths == aKeyPaths, "All fields in aa should have changed")
     }
     
+    func test_Differs_With_Left_Optional() {
+        class A {
+            init(_ value: Int? = 1) { self.optInt = value }
+            var optInt: Int?
+        }
+        class B {
+            var nonOptInt: Int = 2
+        }
+        let mappings: [AnyPropertyMapping] = [
+            PropertyMapping(\A.optInt, \B.nonOptInt)
+        ]
+        let diff = mappings.differs(A(), B())
+        XCTAssert(diff == true, "Defaults A differs from B")
+        let diff1 = mappings.differs(A(2), B())
+        XCTAssert(diff1 == false, "A(2) is equal to B()")
+        let diff2 = mappings.differs(A(nil), B())
+        XCTAssert(diff2 == true, "A(nil) is not equal to B()")
+    }
+    
+    func test_Left_Right_Optional() {
+        class A {
+            init(_ value: Int? = 1) { self.optInt = value }
+            var optInt: Int?
+        }
+        class B {
+            init(_ value: Int? = 2) { self.optInt = value }
+            var optInt: Int?
+        }
+        let mappings: [AnyPropertyMapping] = [
+            PropertyMapping(\A.optInt, \B.optInt)
+        ]
+        let diff = mappings.differs(A(), B())
+        XCTAssert(diff == true, "A() differs from B()")
+        let diff1 = mappings.differs(A(1), B(1))
+        XCTAssert(diff1 == false, "A(1) does not differ from B(1)")
+        let diff2 = mappings.differs(A(nil), B(nil))
+        XCTAssert(diff2 == false, "A(nil) is equal to B(nil)")
+        let diff3 = mappings.differs(A(nil), B(1))
+        XCTAssert(diff3 == true, "A(nil) differs from B(1)")
+        let diff4 = mappings.differs(A(1), B(nil))
+        XCTAssert(diff4 == true, "A(1) differs from B(nil)")
+        var a = A(nil)
+        var b = B(2)
+        mappings.adapt(to: a, from: b)
+        XCTAssert(mappings.differs(a, b) == false, "A(nil) adapting B(2) should result in A(2)")
+        b = B(nil)
+        mappings.apply(from: a, to: b)
+        XCTAssert(mappings.differs(a, b) == false, "A(2) applying to B(nil) should result in B(2)")
+        b = B(nil)
+        a = A(3)
+        mappings.adapt(to: a, from: b)
+        // test fix for #d549ada
+        XCTAssert(a.optInt == nil, "A() should have received nil")
+    }
+    
+    func test_Mapping_Sequence_Differences() {
+        let a = A()
+        let b = B()
+        // make a == b according to mapping
+        defaultMappings.adapt(to: a, from: b)
+        XCTAssert(defaultMappings.differs(a, b) == false, "a == b")
+        // change a
+        a.i = #line
+        if let differences = defaultMappings.differences(a, b) {
+            XCTAssert(differences.count == 1, "One difference")
+        } else {
+            XCTFail("No differences found, there should be 1")
+        }
+    }
+    
+    func test_Mapping_Sequence_DifferencesIndex() {
+        let a = A()
+        let b = B()
+        // make a == b according to mapping
+        defaultMappings.adapt(to: a, from: b)
+        XCTAssert(defaultMappings.differs(a, b) == false, "a == b")
+        // change a
+        a.i = #line
+        a.u = #line
+        let index = defaultMappings.differencesIndex(a, b)
+        XCTAssert(index.count == 2, "Two differences in a vs b")
+        // find in default mappings
+        if let a_i_index = defaultMappings.firstIndex(where: { mapping in
+            return mapping.leftKeyPath == \A.i
+        }), let a_u_index = defaultMappings.firstIndex(where:  { mapping in
+            return mapping.leftKeyPath == \A.u
+        }) {
+            XCTAssert(index.contains(a_i_index), "\\A.i is different")
+            XCTAssert(index.contains(a_u_index), "\\A.u is different")
+        } else {
+            XCTFail("Could not find \\A.i and \\A.u in defaultMappings")
+        }
+    }
+    
+    func test_Adapt_Apply_Mappings_With_Arrays() {
+        let emptyA: [A] = []
+        let emptyB: [B] = []
+        let copyA = [A(), A(), A(), A()]
+        let copyB = [B(), B(), B(), B()]
+        var a = copyA
+        let b = copyB
+        defaultMappings.adapt(to: emptyA, from: emptyB)
+        XCTAssert(equal(emptyA, b: emptyB), "Empty")
+        defaultMappings.adapt(to: a, from: b)
+        XCTAssert(equal(a, b: b), "a == b")
+        defaultMappings.apply(from: emptyA, to: emptyB)
+        XCTAssert(equal(emptyA, b: emptyB), "Empty")
+        a = copyA
+        defaultMappings.apply(from: a, to: b)
+        XCTAssert(equal(a, b: b), "a == b")
+    }
+    
+    func test_Adapt_Apply_Tuples_Array() {
+        let copyAB: [(A, B)] = (0...3).map { _ in
+            return (A(), B())
+        }
+        let arrayA = copyAB.map { a_ in
+            return a_.0
+        }
+        let arrayB = copyAB.map { _b in
+            return _b.1
+        }
+        var tuples = copyAB
+        tuples.adapt(mappings: defaultMappings)
+        let newA = tuples.map { a_ in
+            return a_.0
+        }
+        XCTAssert(equal(newA, b: arrayB), "a == b")
+        tuples = copyAB
+        tuples.apply(mappings: defaultMappings)
+        let newB = tuples.map { _b in
+            return _b.1
+        }
+        XCTAssert(equal(arrayA, b: newB), "a == b")
+    }
+    
+    fileprivate func equal(_ a: [A], b: [B]) -> Bool {
+        guard a.count == b.count else {
+            return false
+        }
+        guard a.count != 0 else {
+            return true
+        }
+        let differences = a.enumerated().reduce(0) { result, item in
+            if defaultMappings.differs(item.element, b[item.offset]) {
+                return result + 1
+            } else {
+                return result
+            }
+        }
+        return differences == 0
+    }
     
     let defaultMappings: [AnyPropertyMapping] = [
         PropertyMapping(\A.i, \B.ii),
