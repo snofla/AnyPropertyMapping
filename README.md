@@ -1,5 +1,8 @@
 # AnyPropertyMapping
 
+![Build](https://github.com/snofla/AnyPropertyMapping/actions/workflows/swift.yml/badge.svg)
+![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)
+
 AnyPropertyMapping provides a convenient way to map properties of class types, and perform operations on instances of them, in both directions. The mapping is entirely based on keypaths. Optional properties are supported out of the box. Since the library depends heavily on keypaths: if the keypath syntax supports it, the library will support it.
 
 Inspiration came from the need to quickly create mocking or intermediate objects between different layers (network or data, or even UI). There's a fairly comprehensive, but not complete, set of utility functions available, and the core functionality (handling keypaths and type erasure especially) are covered by unit tests.
