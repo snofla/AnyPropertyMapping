@@ -287,6 +287,38 @@ class AnyPropertyMappingTests: XCTestCase {
         XCTAssert(equal(arrayA, b: newB), "a == b")
     }
     
+    func test_Differs_Mapping_With_Array() {
+        let a = (0...9).map { _ in
+            return A()
+        }
+        let b = (0...9).map { _ in
+            return B()
+        }
+        // empty arrays are equal
+        XCTAssert(defaultMappings.differs([A](), [B]()) == false, "[] == []")
+        // a != b
+        XCTAssert(defaultMappings.differs(a, b) == true, "a != b")
+        // different array sizes
+        XCTAssert(defaultMappings.differs(Array(a.prefix(2)), b) == true, "Array count mismatch")
+        // copying items from b to a, makes them equal
+        // set up an array where As are set to Bs
+        let equalAB = a
+        defaultMappings.adapt(to: equalAB, from: b)
+        XCTAssert(defaultMappings.differs(equalAB, b) == false, "a == b")
+        // change first item
+        defaultMappings.adapt(to: equalAB, from: b)
+        equalAB.first?.t = "Test String"
+        XCTAssert(defaultMappings.differs(equalAB, b) == true, "a != b")
+        // change last item
+        defaultMappings.adapt(to: equalAB, from: b)
+        equalAB.last?.optV = 8
+        XCTAssert(defaultMappings.differs(equalAB, b) == true, "a != b")
+        // change something in the middle
+        defaultMappings.adapt(to: equalAB, from: b)
+        equalAB[(1..<equalAB.count - 2).randomElement()!].u = 3
+        XCTAssert(defaultMappings.differs(equalAB, b) == true, "a != b")
+    }
+    
     fileprivate func equal(_ a: [A], b: [B]) -> Bool {
         guard a.count == b.count else {
             return false

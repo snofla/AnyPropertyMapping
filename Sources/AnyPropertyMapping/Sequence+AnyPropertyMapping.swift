@@ -138,7 +138,36 @@ extension Sequence where Element == AnyPropertyMapping {
             self.adapt(to: lhs[i], from: rhs[i])
         }
     }
-
+    
+    /// Returns `true` if two arrays of objects differ from each other using the current mapping
+    /// - Returns: `true` if objects differ
+    ///
+    /// Example:
+    ///
+    /// ````
+    /// let a = [Object1(), Object1(), Object1()]
+    /// let b = [Object2(), Object2(), Object2()]
+    /// let mappings: [AnyPropertyMapping] = [
+    ///     PropertyMapping(\Object1.field1, \Object2.field1),
+    ///     PropertyMapping(\Object1.field2, \Object2.field2)
+    /// ]
+    /// mappings.differs(a, b) // true if objects differ according to mapping
+    /// ````
+    public func differs<L: AnyObject, R: AnyObject>(_ lhs: Array<L>, _ rhs: Array<R>) -> Bool {
+        guard lhs.count != 0 && rhs.count != 0 else {
+            return false
+        }
+        guard lhs.count == rhs.count else {
+            return true
+        }
+        guard let _ = zip(lhs, rhs).first(where: { tuple in
+            return self.differs(tuple.0, tuple.1) == true
+        }) else {
+            return false
+        }
+        return true
+    }
+    
 }
 
 
