@@ -174,13 +174,16 @@ extension Sequence where Element == AnyPropertyMapping {
 extension Sequence {
     
     /// Applies mappings to an array of tuples
-    public func apply<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) where Element == (L, R), S.Element == AnyPropertyMapping {
+    @discardableResult
+    public func apply<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Self where Element == (L, R), S.Element == AnyPropertyMapping {
         self.forEach { tuple in
             mappings.apply(from: tuple.0, to: tuple.1)
         }
+        return self
     }
 
-    public func adapt<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) where Element == (L, R), S.Element == AnyPropertyMapping {
+    @discardableResult
+    public func adapt<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Self where Element == (L, R), S.Element == AnyPropertyMapping {
         self.forEach { tuple in
             mappings.adapt(to: tuple.0, from: tuple.1)
         }
