@@ -187,6 +187,26 @@ extension Sequence {
         self.forEach { tuple in
             mappings.adapt(to: tuple.0, from: tuple.1)
         }
+        return self
+    }
+    
+    /// Checks whether an array of tuples of LHS and RHS elements differs according to a mapping
+    /// - Parameter mappings: Mapping to test array of LHS and RHS elements
+    /// - Returns: `true` if any of the elements in the tuples array is different
+    ///
+    /// Example:
+    ///````
+    /// zip([Object1(), Object1()], [Object2(), Object2()]
+    ///     .map { ($0.0, $0.1) }
+    ///     .differs(mappings: someMappings)
+    /// ````
+    public func differs<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Bool where Element == (L, R), S.Element == AnyPropertyMapping {
+        guard let _ = self.first(where: { tuple in
+            return mappings.differs(tuple.0, tuple.1) == true
+        }) else {
+            return false
+        }
+        return true
     }
 
 }

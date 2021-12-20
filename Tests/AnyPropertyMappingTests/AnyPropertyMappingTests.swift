@@ -319,6 +319,57 @@ class AnyPropertyMappingTests: XCTestCase {
         XCTAssert(defaultMappings.differs(equalAB, b) == true, "a != b")
     }
     
+    func test_Tuple_Differs_Mapping() {
+        let emptyAB: [(A, B)] = []
+        // empty arrays always don't differ
+        XCTAssert(emptyAB.differs(mappings: defaultMappings) == false, "(A[]) == B[])")
+        // newly initialized differs
+        XCTAssert(defaultTupleArray().differs(mappings: defaultMappings) == true, "Default tuple array doesn't differ")
+        // A <- B should result in equal array
+        XCTAssert(defaultTupleArray().adapt(mappings: defaultMappings).differs(mappings: defaultMappings) == false, "Adapting should return in no differences")
+        // A -> B should result in equal array
+        XCTAssert(defaultTupleArray().apply(mappings: defaultMappings).differs(mappings: defaultMappings) == false, "Applying should return in no differences")
+        // change first
+        var changeFirst = defaultTupleArray()
+        changeFirst.first?.0.i = 3
+        XCTAssert(changeFirst.differs(mappings: defaultMappings) == true, "Changed first lhs should result in difference")
+        changeFirst = defaultTupleArray()
+        changeFirst.first?.1.optU = #line
+        XCTAssert(changeFirst.differs(mappings: defaultMappings) == true, "Changed first rhs should result in difference")
+        var changeLast = defaultTupleArray()
+        changeLast.last?.0.optV = #line
+        XCTAssert(changeLast.differs(mappings: defaultMappings) == true, "Changed last lhs should result in difference")
+        changeLast = defaultTupleArray()
+        changeLast.last?.1.tt = "\(#line)"
+        XCTAssert(changeLast.differs(mappings: defaultMappings) == true, "Changed last rhs should result in difference")
+        var changeMiddle = defaultTupleArray()
+        var index = (1..<changeMiddle.count - 2).randomElement()!
+        changeMiddle[index].0.optW = Double(#line)
+        XCTAssert(changeMiddle.differs(mappings: defaultMappings), "Changed random lhs should result in difference")
+        changeMiddle = defaultTupleArray()
+        index = (1..<changeMiddle.count - 2).randomElement()!
+        changeMiddle[index].1.optU = #line
+        XCTAssert(changeMiddle.differs(mappings: defaultMappings), "Changed random rhs should result in difference")
+    }
+    
+    func test_AnyPropertingMapping() {
+//        let mappingSet: Set<AnyPropertyMapping> = Set(self.defaultMappings)
+        
+    }
+    
+    fileprivate func defaultTupleArray() -> [(A, B)] {
+        let a = (0...9).map { _ in
+            return A()
+        }
+        let b = (0...9).map { _ in
+            return B()
+        }
+        let result = zip(a, b).map { tuple in
+            return tuple
+        }
+        return result
+    }
+    
     fileprivate func equal(_ a: [A], b: [B]) -> Bool {
         guard a.count == b.count else {
             return false
