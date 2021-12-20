@@ -48,7 +48,7 @@ extension Sequence where Element == AnyPropertyMapping {
         }
     }
     
-    /// Returns `true` if two objects differ from each order using the current mapping
+    /// Returns `true` if two objects differ from each other using the current mapping
     /// - Returns: `true` if objects differ
     ///
     /// Example:
