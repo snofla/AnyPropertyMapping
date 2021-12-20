@@ -10,16 +10,6 @@ import Foundation
 
 extension PropertyMapping {
     
-    enum Forwarder<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable> {
-        case asIs(ForwarderAsIs<L, R, V>)
-        case lhs(ForwarderOptionalLhs<L, R, V>)
-        case rhs(ForwarderOptionalRhs<L, R, V>)
-        case both(ForwarderOptionalBoth<L, R, V>)
-    }
-    
-    // Forwarders are hard to type-erase because of constructors receiving
-    // an optional on either the lhs or rhs.
-    
     // As-is forwarder, with either L and R *both* non-optional.
     // Operations adapt, apply, differs are implemented by TypePropertyMapping.
     struct ForwarderAsIs<L: AnyObject, R: AnyObject, V: Equatable>: TypePropertyMapping {

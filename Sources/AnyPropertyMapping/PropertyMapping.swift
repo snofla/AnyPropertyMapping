@@ -26,7 +26,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V>) {
-        self.forwarder = .asIs(.init(leftKeyPath: lhs, rightKeyPath: rhs))
+        self.forwarder = ForwarderAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Constructs a mapping between two object's properties. The lefr-hand side object's property
@@ -35,7 +35,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V>) {
-        self.forwarder = .lhs(.init(leftKeyPath: lhs, rightKeyPath: rhs))
+        self.forwarder = ForwarderOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Constructs a mapping between two object's properties. The right-hand side object's property
@@ -44,7 +44,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V?>) {
-        self.forwarder = .rhs(.init(leftKeyPath: lhs, rightKeyPath: rhs))
+        self.forwarder = ForwarderOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
     /// Constructs a mapping between two object's properties. Both left-hand side and  right-hand side object's
@@ -53,80 +53,35 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V?>) {
-        self.forwarder = .both(.init(leftKeyPath: lhs, rightKeyPath: rhs))
+        self.forwarder = ForwarderOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Left-hand side keypath
     public var leftKeyPath: AnyKeyPath {
-        switch self.forwarder {
-        case .asIs(let forwarder):
-            return forwarder.leftKeyPath
-        case .lhs(let forwarder):
-            return forwarder.leftKeyPath
-        case .rhs(let forwarder):
-            return forwarder.leftKeyPath
-        case .both(let forwarder):
-            return forwarder.leftKeyPath
-        }
+        return self.forwarder.leftKeyPath
     }
     
     /// Right-hand side keypath
     public var rightKeyPath: AnyKeyPath {
-        switch self.forwarder {
-        case .asIs(let forwarder):
-            return forwarder.rightKeyPath
-        case .lhs(let forwarder):
-            return forwarder.rightKeyPath
-        case .rhs(let forwarder):
-            return forwarder.rightKeyPath
-        case .both(let forwarder):
-            return forwarder.rightKeyPath
-        }
+        return self.forwarder.rightKeyPath
     }
     
-    private let forwarder: Forwarder<L, R, V>
+    private let forwarder: AnyPropertyMapping
 }
 
 
 extension PropertyMapping {
     
     public func adapt(to lhs: Any, from rhs: Any) {
-        switch self.forwarder {
-        case .asIs(let forwarder):
-            forwarder.adapt(to: lhs, from: rhs)
-        case .lhs(let forwarder):
-            forwarder.adapt(to: lhs, from: rhs)
-        case .rhs(let forwarder):
-            forwarder.adapt(to: lhs, from: rhs)
-        case .both(let forwarder):
-            forwarder.adapt(to: lhs, from: rhs)
-        }
+        self.forwarder.adapt(to: lhs, from: rhs)
     }
     
     public func apply(from lhs: Any, to rhs: Any) {
-        switch self.forwarder {
-        case .asIs(let forwarder):
-            forwarder.apply(from: lhs, to: rhs)
-        case .lhs(let forwarder):
-            forwarder.apply(from: lhs, to: rhs)
-        case .rhs(let forwarder):
-            forwarder.apply(from: lhs, to: rhs)
-        case .both(let forwarder):
-            forwarder.apply(from: lhs, to: rhs)
-        }
+        self.forwarder.apply(from: lhs, to: rhs)
     }
     
     public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
-        switch self.forwarder {
-        case .asIs(let forwarder):
-            return forwarder.differs(lhs, rhs)
-        case .lhs(let forwarder):
-            return forwarder.differs(lhs, rhs)
-        case .rhs(let forwarder):
-            return forwarder.differs(lhs, rhs)
-        case .both(let forwarder):
-            return forwarder.differs(lhs, rhs)
-        }
+        self.forwarder.differs(lhs, rhs)
     }
     
 }
