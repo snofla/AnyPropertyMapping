@@ -352,9 +352,47 @@ class AnyPropertyMappingTests: XCTestCase {
         XCTAssert(changeMiddle.differs(mappings: defaultMappings), "Changed random rhs should result in difference")
     }
     
-    func test_AnyPropertingMapping() {
-//        let mappingSet: Set<AnyPropertyMapping> = Set(self.defaultMappings)
-        
+    func test_Inverted() {
+        // We're testing A <- B followed by the inverse B -> A and test the result (A == A)
+        // (See implementation of `invertedMappingAdaptApplyIsEqual()`)
+        // Test non-optional lhs and rhs
+        XCTAssert(invertedMappingAdaptApplyIsEqual(with: PropertyMapping(\A.i, \B.ii)), "A == A'")
+        // Test optional lhs and non-optional rhs
+        XCTAssert(invertedMappingAdaptApplyIsEqual(with: PropertyMapping(\A.optV, \B.vv)), "A == A'")
+        // Test non-optional lhs and optional rhs
+        XCTAssert(invertedMappingAdaptApplyIsEqual(with: PropertyMapping(\A.u, \B.optU)), "A == A'")
+        // Test optional lhs and optional rhs
+        XCTAssert(invertedMappingAdaptApplyIsEqual(with: PropertyMapping(\A.optW, \B.optWW)), "A == A'")
+    }
+    
+    func test_Mapping_Array_Inverted() {
+        let mappingAB = defaultMappings
+        let mappingBA = defaultMappings.inverted()
+        let aAB = [A].init(repeating: A(), count: 10)
+        let bAB = [B].init(repeating: B(), count: 10)
+        let aBA = [A].init(repeating: A(), count: 10)
+        let bBA = [B].init(repeating: B(), count: 10)
+        // Inverse means that opposite operations
+        // should return equivalent results
+        mappingAB.adapt(to: aAB, from: bAB)
+        mappingBA.apply(from: bBA, to: aBA)
+        XCTAssert(defaultEqualityMappingForA.differs(aAB, aBA) == false, "[A] == [A]'")
+    }
+    
+    fileprivate func invertedMappingAdaptApplyIsEqual(with mapping: AnyPropertyMapping) -> Bool  {
+        let mappingAB = mapping
+        let mappingBA = mappingAB.inverted()
+        // objects for <A, B> mapping
+        let aAB = A()
+        let bAB = B()
+        // objects for <B, A> mapping
+        let aBA = A()
+        let bBA = B()
+        // Inverse means that opposite operations
+        // should return equivalent results
+        mappingAB.adapt(to: aAB, from: bAB)
+        mappingBA.apply(from: bBA, to: aBA)
+        return defaultEqualityMappingForA.differs(aAB, aBA) == false
     }
     
     fileprivate func defaultTupleArray() -> [(A, B)] {
