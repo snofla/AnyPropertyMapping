@@ -26,17 +26,23 @@ public protocol AnyPropertyMapping {
     /// Returns the inverse of a property mapping
     func inverted() -> AnyPropertyMapping
     
+    /// Left keypath. This can be cast to a writable keypath if the Root and
+    /// Value are known.
     var leftKeyPath: AnyKeyPath { get }
     
-    /// Right keypath
+    /// Right keypath. This can be cast to a writable keypath if the Root and
+    /// Value are known.
     var rightKeyPath: AnyKeyPath { get }
 }
 
 // - MARK: Internals
 
+/// Declare an internal protocol that helps to define the generic property
+/// mapping. It used both as a base class and as a box for concrete
+/// classes.
 protocol TypePropertyMappingBase: AnyPropertyMapping {
 
-    /// Constraints (requires)
+    /// Constraints (requirements)
     associatedtype Left: AnyObject
     associatedtype Right: AnyObject
     associatedtype Value: Equatable
@@ -47,8 +53,10 @@ protocol TypePropertyMappingBase: AnyPropertyMapping {
 }
 
 
-protocol TypePropertyMapping: TypePropertyMappingBase {    
+protocol TypePropertyMapping: TypePropertyMappingBase {
+    /// Internal left keypath
     var _leftKeyPath: WritableKeyPath<Left, Value> { get }
+    /// Internal right keypath
     var _rightKeyPath: WritableKeyPath<Right, Value> { get }
 }
 
@@ -56,7 +64,9 @@ protocol TypePropertyMapping: TypePropertyMappingBase {
 extension TypePropertyMapping {
     
     // We can't shadow, but we can implement the Any varieties, and
-    // then call actual implementation.
+    // then call actual implementation. They are only called
+    // for the simplest concrete implementation. Specific
+    // implementations may need to overload the functions.
     
     public func adapt(to lhs:  Any, from rhs: Any) {
         let _lhs = lhs as! Self.Left

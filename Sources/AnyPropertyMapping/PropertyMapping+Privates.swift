@@ -10,9 +10,8 @@ import Foundation
 
 extension PropertyMapping {
  
-    static func testArguments(_ function: StaticString, _ lhs: Any, rhs: Any) {
-        assert(lhs is L, "\(function): Type of left-hand side should match with the left-hand side mapping argument")
-        assert(rhs is R, "\(function): Type of right-hand side shouuld match with the right-hand side mapping argument")
+    static func testArguments(_ function: StaticString, _ lhs: Any, _ rhs: Any) {
+        assert(lhs is L && rhs is R, "\(function): Mapping was <(\(L.self), \(R.self))>, operation arguments (\(type(of: lhs)), \(type(of: rhs)))")
     }
     
 }

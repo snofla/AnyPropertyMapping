@@ -47,7 +47,7 @@ extension PropertyMapping {
     // are writable, we have to satisfy mutability.
     // Note that the Left associated type points to the class it self, whereas
     // the L generic parameter is used as an lhs to adapt/apply/differ.
-    class ForwarderOptionalLhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
+    final class ForwarderOptionalLhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
 
         // For the LHS we don't want to use L, because that would mean that
         // _leftKeyPath would be pointing to a V, and not a V?. _leftKeyPath
@@ -64,7 +64,7 @@ extension PropertyMapping {
         }
 
         public func adapt(to lhs: Any, from rhs: Any) {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning non optional (rhs) to optional (lhs) is always possible
@@ -72,7 +72,7 @@ extension PropertyMapping {
         }
         
         public func apply(from lhs: Any, to rhs:  Any) {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning optional value (lhs) to non-optional (rhs) is not
@@ -81,7 +81,7 @@ extension PropertyMapping {
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             let _rhs = rhs as! R
             // unwrap if needed, choose default value
@@ -110,7 +110,7 @@ extension PropertyMapping {
     
     
     // Forwarder for when right-hand side is an optional
-    class ForwarderOptionalRhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
+    final class ForwarderOptionalRhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
 
         // For the RHS we don't want to use R, because that would mean that
         // _rightKeyPath would be pointing to a V, and not a V?. _rightKeyPath
@@ -127,7 +127,7 @@ extension PropertyMapping {
         }
 
         public func adapt(to lhs: Any, from rhs: Any) {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning optional to non-optional requires a default value
@@ -135,7 +135,7 @@ extension PropertyMapping {
         }
         
         public func apply(from lhs: Any, to rhs:  Any) {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning non-optional to optional is always possible
@@ -143,7 +143,7 @@ extension PropertyMapping {
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             let _rhs = rhs as! R
             // unwrap if needed, choose default value
@@ -168,8 +168,8 @@ extension PropertyMapping {
         fileprivate var _stub = V()
     }
     
-    
-    class ForwarderOptionalBoth<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
+    /// Class handling the case were both LHS and RHS values are optional types.
+    final class ForwarderOptionalBoth<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
 
         typealias Left = ForwarderOptionalBoth
         typealias Right = ForwarderOptionalBoth
@@ -183,7 +183,7 @@ extension PropertyMapping {
         }
 
         public func adapt(to lhs: Any, from rhs: Any) {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning non-optional to non-optional is always possible
@@ -191,7 +191,7 @@ extension PropertyMapping {
         }
         
         public func apply(from lhs: Any, to rhs:  Any) {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning non-optional to non-optional is always possible
@@ -199,7 +199,7 @@ extension PropertyMapping {
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
-            PropertyMapping.testArguments(#function, lhs, rhs: rhs)
+            PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             let _rhs = rhs as! R
             // unwrap if needed, choose default value
@@ -218,7 +218,10 @@ extension PropertyMapping {
             return self._realRighKeyPath
         }
 
+        /// Unused for the both optional L, R case
         let _leftKeyPath: WritableKeyPath<Left, V>
+        
+        /// Unused for the both optional L, R case
         let _rightKeyPath: WritableKeyPath<Right, V>
 
         fileprivate let _realLeftKeyPath: WritableKeyPath<L, V?>

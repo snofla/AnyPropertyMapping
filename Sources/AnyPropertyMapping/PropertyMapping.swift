@@ -7,7 +7,9 @@
 
 import Foundation
 
-/// Sets up a mapping between two properties of two different classes.
+/// Sets up a mapping between two properties of two different classes. This is used as
+/// a concrete generic implementation. Swift's type inference will make sure the correct
+/// constructor is chosen depending on the use of the class.
 public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMappingBase {
     
     // Implementation: we forward keypath operations to a forwarder class,
@@ -73,15 +75,19 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
 extension PropertyMapping {
     
     public func adapt(to lhs: Any, from rhs: Any) {
+        PropertyMapping.testArguments(#function, lhs, rhs)
         self.forwarder.adapt(to: lhs, from: rhs)
     }
     
     public func apply(from lhs: Any, to rhs: Any) {
+        PropertyMapping.testArguments(#function, lhs, rhs)
         self.forwarder.apply(from: lhs, to: rhs)
     }
     
     public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
-        self.forwarder.differs(lhs, rhs)
+        PropertyMapping.testArguments(#function, lhs, rhs)
+        return self.forwarder.differs(lhs, rhs)
+    }
     
     public func inverted() -> AnyPropertyMapping {
         // Create an inverse mapping by inverting the forwarder,
