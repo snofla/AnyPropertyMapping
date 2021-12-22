@@ -22,6 +22,14 @@ extension PropertyMapping {
             self._rightKeyPath = rightKeyPath
         }
         
+        func inverted() -> AnyPropertyMapping {
+            // This formally should use the PropertyMapping<R, L, V>.ForwarderAsIs<R, L, V>
+            // subclass, but PropertyMapping<> requires its V parameter to
+            // be default constructable, which is not needed for this
+            // specialised case. 
+            return ForwarderAsIs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._leftKeyPath)
+        }
+        
         var leftKeyPath: AnyKeyPath {
             return self._leftKeyPath
         }
@@ -78,6 +86,10 @@ extension PropertyMapping {
             let _rhs = rhs as! R
             // unwrap if needed, choose default value
             return _lhs[keyPath: self._realLeftKeyPath] ?? V() != _rhs[keyPath: self._rightKeyPath]
+        }
+        
+        public func inverted() -> AnyPropertyMapping {
+            return PropertyMapping<R, L, V>.ForwarderOptionalRhs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._realLeftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
@@ -138,6 +150,10 @@ extension PropertyMapping {
             return _lhs[keyPath: self._leftKeyPath] != (_rhs[keyPath: self._realRighKeyPath] ?? V())
         }
         
+        public func inverted() -> AnyPropertyMapping {
+            return PropertyMapping<R, L, V>.ForwarderOptionalLhs<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._leftKeyPath)
+        }
+        
         var leftKeyPath: AnyKeyPath {
             return self._leftKeyPath
         }
@@ -188,6 +204,10 @@ extension PropertyMapping {
             let _rhs = rhs as! R
             // unwrap if needed, choose default value
             return (_lhs[keyPath: self._realLeftKeyPath] ?? V()) != (_rhs[keyPath: self._realRighKeyPath] ?? V())
+        }
+        
+        public func inverted() -> AnyPropertyMapping {
+            return PropertyMapping<R, L, V>.ForwarderOptionalBoth<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._realLeftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {

@@ -82,6 +82,12 @@ extension PropertyMapping {
     
     public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
         self.forwarder.differs(lhs, rhs)
+    
+    public func inverted() -> AnyPropertyMapping {
+        // Create an inverse mapping by inverting the forwarder,
+        // and creating a PropertyMapping with its generic L and
+        // R reversed.
+        return self.forwarder.inverted()
     }
     
 }

@@ -23,7 +23,9 @@ public protocol AnyPropertyMapping {
     /// both arguments is defined by the conforming classes.
     func differs(_ lhs: Any, _ rhs: Any) -> Bool
     
-    /// Left keypath
+    /// Returns the inverse of a property mapping
+    func inverted() -> AnyPropertyMapping
+    
     var leftKeyPath: AnyKeyPath { get }
     
     /// Right keypath

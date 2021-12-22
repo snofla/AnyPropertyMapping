@@ -91,6 +91,13 @@ extension Sequence where Element == AnyPropertyMapping {
         return diffIndices
     }
     
+    /// Returns the inverse of a mapping sequence
+    public func inverted() -> [Element] {
+        return self.map { mapping in
+            return mapping.inverted()
+        }
+    }
+    
     /// Applies mapping to two arrays of objects. If arrays have not the equal sizes, mappings
     /// are applied to the least number of objects in either of the arrays.
     ///
