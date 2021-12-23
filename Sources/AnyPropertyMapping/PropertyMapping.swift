@@ -12,11 +12,9 @@ import Foundation
 /// constructor is chosen depending on the use of the class.
 public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: AnyPropertyMapping  {
     
-    // Implementation: we forward keypath operations to a forwarder class,
+    // Implementation: we forward operations to a box class,
     // each having a different constructor to support optionals in
-    // either the lhs or rhs keypath value. Ideally we want the forwarder
-    // classes to be type-erased, but optionals (and static type requirements)
-    // make that impossible.
+    // either the lhs or rhs keypath value, or both.
     
     /// Constructs a mapping between two object's properties. Properties are either _both_ non-optional,
     /// or optional.
@@ -24,7 +22,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V>) {
-        self.forwarder = ForwarderAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Constructs a mapping between two object's properties. The lefr-hand side object's property
@@ -33,7 +31,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V>) {
-        self.forwarder = ForwarderOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = PropertyMappingBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Constructs a mapping between two object's properties. The right-hand side object's property
@@ -42,7 +40,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V?>) {
-        self.forwarder = ForwarderOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = PropertyMappingBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
     /// Constructs a mapping between two object's properties. Both left-hand side and  right-hand side object's
@@ -51,20 +49,20 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V?>) {
-        self.forwarder = ForwarderOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Left-hand side keypath
     public var leftKeyPath: AnyKeyPath {
-        return self.forwarder.leftKeyPath
+        return self.boxedImpl.leftKeyPath
     }
     
     /// Right-hand side keypath
     public var rightKeyPath: AnyKeyPath {
-        return self.forwarder.rightKeyPath
+        return self.boxedImpl.rightKeyPath
     }
     
-    private let forwarder: AnyPropertyMapping
+    private let boxedImpl: AnyPropertyMapping
 }
 
 
@@ -72,24 +70,21 @@ extension PropertyMapping {
     
     public func adapt(to lhs: Any, from rhs: Any) {
         PropertyMapping.testArguments(#function, lhs, rhs)
-        self.forwarder.adapt(to: lhs, from: rhs)
+        self.boxedImpl.adapt(to: lhs, from: rhs)
     }
     
     public func apply(from lhs: Any, to rhs: Any) {
         PropertyMapping.testArguments(#function, lhs, rhs)
-        self.forwarder.apply(from: lhs, to: rhs)
+        self.boxedImpl.apply(from: lhs, to: rhs)
     }
     
     public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
         PropertyMapping.testArguments(#function, lhs, rhs)
-        return self.forwarder.differs(lhs, rhs)
+        return self.boxedImpl.differs(lhs, rhs)
     }
     
     public func inverted() -> AnyPropertyMapping {
-        // Create an inverse mapping by inverting the forwarder,
-        // and creating a PropertyMapping with its generic L and
-        // R reversed.
-        return self.forwarder.inverted()
+        return self.boxedImpl.inverted()
     }
     
 }

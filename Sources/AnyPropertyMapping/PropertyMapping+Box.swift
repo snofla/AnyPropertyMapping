@@ -1,5 +1,5 @@
 //
-//  PropertyMapping+Forwarder.swift
+//  PropertyMapping+Box.swift
 //  AnyPropertyMapping
 //
 //  Created by Alfons Hoogervorst on 19/12/2021.
@@ -10,9 +10,9 @@ import Foundation
 
 extension PropertyMapping {
     
-    // As-is forwarder, with either L and R *both* non-optional.
-    // Operations adapt, apply, differs are implemented by TypePropertyMapping.
-    struct ForwarderAsIs<L: AnyObject, R: AnyObject, V: Equatable>: TypePropertyMapping {
+    // As-is box, with either L and R *both* non-optional.
+    // Operations adapt, apply, differs are implemented by PropertyMappingBox default extension methods.
+    struct PropertyMappingBoxAsIs<L: AnyObject, R: AnyObject, V: Equatable>: PropertyMappingBox {
         typealias Left = L
         typealias Right = R
         typealias Value = V
@@ -23,11 +23,11 @@ extension PropertyMapping {
         }
         
         func inverted() -> AnyPropertyMapping {
-            // This formally should use the PropertyMapping<R, L, V>.ForwarderAsIs<R, L, V>
+            // This formally should use the PropertyMapping<R, L, V>.PropertyMappingBoxAsIs<R, L, V>
             // subclass, but PropertyMapping<> requires its V parameter to
             // be default constructable, which is not needed for this
             // specialised case. 
-            return ForwarderAsIs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._leftKeyPath)
+            return PropertyMappingBoxAsIs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._leftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
@@ -42,18 +42,18 @@ extension PropertyMapping {
         let _rightKeyPath: WritableKeyPath<R, V>
     }
     
-    // Left-hand optional forwarder; this is a *class* because the left-hand
+    // Left-hand optional box; this is a *class* because the left-hand
     // side leftKeyPath will point to a stub in this class: since our keypaths
     // are writable, we have to satisfy mutability.
     // Note that the Left associated type points to the class it self, whereas
     // the L generic parameter is used as an lhs to adapt/apply/differ.
-    final class ForwarderOptionalLhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
+    final class PropertyMappingBoxOptionalLhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: PropertyMappingBox {
 
         // For the LHS we don't want to use L, because that would mean that
         // _leftKeyPath would be pointing to a V, and not a V?. _leftKeyPath
         // becomes a dummy, and we introduce _realLeftKeyPath to point to
         // a WritableKeyPath<L, V?>
-        typealias Left = ForwarderOptionalLhs
+        typealias Left = PropertyMappingBoxOptionalLhs
         typealias Right = R
         typealias Value = V
         
@@ -89,7 +89,7 @@ extension PropertyMapping {
         }
         
         public func inverted() -> AnyPropertyMapping {
-            return PropertyMapping<R, L, V>.ForwarderOptionalRhs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._realLeftKeyPath)
+            return PropertyMapping<R, L, V>.PropertyMappingBoxOptionalRhs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._realLeftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
@@ -109,15 +109,15 @@ extension PropertyMapping {
     }
     
     
-    // Forwarder for when right-hand side is an optional
-    final class ForwarderOptionalRhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
+    // Box for when right-hand side is an optional
+    final class PropertyMappingBoxOptionalRhs<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: PropertyMappingBox {
 
         // For the RHS we don't want to use R, because that would mean that
         // _rightKeyPath would be pointing to a V, and not a V?. _rightKeyPath
         // becomes a dummy, and we introduce _realRightKeyPath to point to
         // a WritableKeyPath<R, V?>
         typealias Left = L
-        typealias Right = ForwarderOptionalRhs
+        typealias Right = PropertyMappingBoxOptionalRhs
         typealias Value = V
         
         init(leftKeyPath: WritableKeyPath<L, V>, rightKeyPath: WritableKeyPath<R, V?>) {
@@ -151,7 +151,7 @@ extension PropertyMapping {
         }
         
         public func inverted() -> AnyPropertyMapping {
-            return PropertyMapping<R, L, V>.ForwarderOptionalLhs<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._leftKeyPath)
+            return PropertyMapping<R, L, V>.PropertyMappingBoxOptionalLhs<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._leftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
@@ -169,10 +169,10 @@ extension PropertyMapping {
     }
     
     /// Class handling the case were both LHS and RHS values are optional types.
-    final class ForwarderOptionalBoth<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMapping {
+    final class PropertyMappingBoxOptionalBoth<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: PropertyMappingBox {
 
-        typealias Left = ForwarderOptionalBoth
-        typealias Right = ForwarderOptionalBoth
+        typealias Left = PropertyMappingBoxOptionalBoth
+        typealias Right = PropertyMappingBoxOptionalBoth
         typealias Value = V
         
         init(leftKeyPath: WritableKeyPath<L, V?>, rightKeyPath: WritableKeyPath<R, V?>) {
@@ -207,7 +207,7 @@ extension PropertyMapping {
         }
         
         public func inverted() -> AnyPropertyMapping {
-            return PropertyMapping<R, L, V>.ForwarderOptionalBoth<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._realLeftKeyPath)
+            return PropertyMapping<R, L, V>.PropertyMappingBoxOptionalBoth<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._realLeftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
