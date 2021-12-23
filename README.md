@@ -130,13 +130,19 @@ More documentation is forthcoming, but also take a look at the unit tests.
   ]
   ```
 
-* Optional properties are supported, where LHS and RHS properties may even have different `optionality`. In that case all operations instantiate a new default instance of the property's type and use that as the default value in the operations. If this is not what you want, exclude optionals from your mappings sequence.
+* Optional properties are supported, where LHS and RHS properties may even have different `optionality`. In that case all operations instantiate a new default instance of the property's type and use that as the default value in the operations. If this is not what you want, exclude optionals from your mappings sequence. 
 
- 
 
-## Authors
+
+## Author(s)
 
 Alfons Hoogervorst
+
+
+
+## Thanks
+
+Elastique (https://www.elastique.nl); we do really interesting things.
 
 
 
