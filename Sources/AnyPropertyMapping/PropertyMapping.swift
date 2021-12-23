@@ -10,17 +10,13 @@ import Foundation
 /// Sets up a mapping between two properties of two different classes. This is used as
 /// a concrete generic implementation. Swift's type inference will make sure the correct
 /// constructor is chosen depending on the use of the class.
-public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: TypePropertyMappingBase {
+public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: AnyPropertyMapping  {
     
     // Implementation: we forward keypath operations to a forwarder class,
     // each having a different constructor to support optionals in
     // either the lhs or rhs keypath value. Ideally we want the forwarder
     // classes to be type-erased, but optionals (and static type requirements)
     // make that impossible.
-    
-    public typealias Left = L
-    public typealias Right = R
-    public typealias Value = V
     
     /// Constructs a mapping between two object's properties. Properties are either _both_ non-optional,
     /// or optional.
