@@ -1,5 +1,6 @@
 # AnyPropertyMapping
 
+[![CocoaPods](https://img.shields.io/cocoapods/v/AnyPropertyMapping.svg?maxAge=2592000?style=flat-square)]()
 ![Build](https://github.com/snofla/AnyPropertyMapping/actions/workflows/swift.yml/badge.svg)
 ![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)
 
@@ -20,6 +21,12 @@ Add the following dependency to your **Package.swift** file:
 ```swift
 .package(url: "https://github.com/snofla/AnyPropertyMapping.git", from: "1.0.0")
 ```
+
+For CocoaPods add the following line to your **Podfile**:
+
+````ruby
+pod 'AnyPropertyMapping'
+````
 
 
 
