@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  PropertyMapping+TransformBox.swift
 //  
 //
 //  Created by Alfons Hoogervorst on 24/12/2021.
