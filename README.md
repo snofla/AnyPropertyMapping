@@ -14,15 +14,13 @@ This library uses generics and leans heavily on type erasure: Swift 5+ only, not
 
 ## Installation
 
-Right now only Swift Package Manager (SPM) is supported, CocoaPods support is underway. 
-
 Add the following dependency to your **Package.swift** file:
 
 ```swift
 .package(url: "https://github.com/snofla/AnyPropertyMapping.git", from: "1.0.0")
 ```
 
-For CocoaPods add the following line to your **Podfile**:
+Or, if you're using CocoaPods, add the following line to your **Podfile**:
 
 ````ruby
 pod 'AnyPropertyMapping'
