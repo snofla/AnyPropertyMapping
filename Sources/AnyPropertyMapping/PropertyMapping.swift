@@ -10,7 +10,7 @@ import Foundation
 /// Sets up a mapping between two properties of two different classes. This is used as
 /// a concrete generic implementation. Swift's type inference will make sure the correct
 /// constructor is chosen depending on the use of the class.
-public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & DefaultConstructable>: AnyPropertyMapping  {
+public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & DefaultConstructable, RV: Equatable & DefaultConstructable>: AnyPropertyMapping  {
     
     // Implementation: we forward operations to a box class,
     // each having a different constructor to support optionals in
@@ -21,7 +21,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
-    public init(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V>) {
+    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
         self.boxedImpl = PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
@@ -30,7 +30,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
-    public init(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V>) {
+    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
         self.boxedImpl = PropertyMappingBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
@@ -39,7 +39,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
-    public init(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V?>) {
+    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
         self.boxedImpl = PropertyMappingBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
@@ -48,7 +48,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, V: Equatable & De
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
-    public init(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V?>) {
+    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
         self.boxedImpl = PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
