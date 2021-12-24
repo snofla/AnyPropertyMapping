@@ -379,6 +379,33 @@ class AnyPropertyMappingTests: XCTestCase {
         XCTAssert(defaultEqualityMappingForA.differs(aAB, aBA) == false, "[A] == [A]'")
     }
     
+    func test_Mapping_Mismatching_Types() {
+        let mapping: [AnyPropertyMapping] = [
+            PropertyMapping(\A.i, \B.tt, transformer: PropertyTransformers.intString)
+        ]
+        let a = A()
+        let b = B()
+        mapping.adapt(to: a, from: b)
+        XCTAssert(a.i == Int(b.tt), "a.i == b.tt (transformed from string)")
+        a.i = 300
+        mapping.apply(from: a, to: b)
+        XCTAssert("\(a.i)" == b.tt, "a.i == b.tt (transformed from int)")
+    }
+    
+    func test_Mapping_Inverted_Mismatching_Types() {
+        let mapping: [AnyPropertyMapping] = [
+            PropertyMapping(\A.i, \B.tt, transformer: PropertyTransformers.intString).inverted()
+        ]
+        let a = A()
+        let b = B()
+        mapping.adapt(to: b, from: a)
+        XCTAssert(a.i == Int(b.tt), "a.i == b.tt (transformed from string)")
+        b.tt = "999"
+        mapping.apply(from: b, to: a)
+        XCTAssert("\(a.i)" == b.tt, "a.i == b.tt (transformed from int)")
+    }
+    
+    
     fileprivate func invertedMappingAdaptApplyIsEqual(with mapping: AnyPropertyMapping) -> Bool  {
         let mappingAB = mapping
         let mappingBA = mappingAB.inverted()
@@ -459,7 +486,7 @@ class A {
     
     var i: Int = 1
     var j: Int = 2
-    var t: String = "t"
+    var t: String = "1"
     var u: Int = 3
     var optV: Int? = 4
     var optW: Double? = 9
@@ -469,7 +496,7 @@ class B {
     
     var ii: Int = 2
     var jj: Int = 1
-    var tt: String = "tt"
+    var tt: String = "12"
     var optU: Int?
     var vv: Int = 5
     var optWW: Double? = 10
