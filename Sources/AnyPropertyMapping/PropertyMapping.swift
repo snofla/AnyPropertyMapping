@@ -16,13 +16,22 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     // each having a different constructor to support optionals in
     // either the lhs or rhs keypath value, or both.
     
-    /// Constructs a mapping between two object's properties. Properties are either _both_ non-optional,
-    /// or optional.
+    /// Constructs a mapping between two object's properties. Properties are _both_ non-optional.
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
         self.boxedImpl = PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
+    }
+
+    /// Constructs a mapping between two object's properties, where the properties
+    /// are of different types. Properties are _both_ non-optional.
+    /// - Parameters:
+    ///   - lhs: Left-hand side object's keypath
+    ///   - rhs: Right-hand side object's keypath
+    ///   - transformer: Transformer to use
+    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) {
+        self.boxedImpl = PropertyMappingTransformBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
     
     /// Constructs a mapping between two object's properties. The lefr-hand side object's property
