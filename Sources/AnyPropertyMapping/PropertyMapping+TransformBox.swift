@@ -41,6 +41,15 @@ extension PropertyMapping {
             rhs[keyPath: self._rightKeyPath] = transformedRhsValue
         }
         
+        func differs(_ lhs: Any, _ rhs: Any) -> Bool {
+            let lhs = lhs as! Left
+            let rhs = rhs as! Right
+            guard let transformedLhsValue = try? self._transformer._adapt(from: rhs[keyPath: self._rightKeyPath]) as? LValue else {
+                return true
+            }
+            return lhs[keyPath: self._leftKeyPath] != transformedLhsValue
+        }
+        
         func inverted() -> AnyPropertyMapping {
             typealias InvertedSelf = PropertyMappingTransformBoxAsIs<R, L, RValue, LValue>
             // note: InvertedSelf.LValue == R

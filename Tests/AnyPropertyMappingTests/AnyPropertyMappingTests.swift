@@ -390,6 +390,8 @@ class AnyPropertyMappingTests: XCTestCase {
         a.i = 300
         mapping.apply(from: a, to: b)
         XCTAssert("\(a.i)" == b.tt, "a.i == b.tt (transformed from int)")
+        // check whether they differ (they should not)
+        XCTAssert(mapping.differs(a, b) == false, "a.i == b.tt (transformed from int)")
     }
     
     func test_Mapping_Inverted_Mismatching_Types() {
@@ -403,6 +405,8 @@ class AnyPropertyMappingTests: XCTestCase {
         b.tt = "999"
         mapping.apply(from: b, to: a)
         XCTAssert("\(a.i)" == b.tt, "a.i == b.tt (transformed from int)")
+        // check whether they differ (they should not)
+        XCTAssert(mapping.differs(b, a) == false, "a.i == b.tt (transformed from int)")
     }
     
     
