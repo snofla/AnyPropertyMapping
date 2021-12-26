@@ -16,29 +16,50 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     // each having a different constructor to support optionals in
     // either the lhs or rhs keypath value, or both.
     
-    /// Constructs a mapping between two object's properties. Properties are _both_ non-optional.
+    /// Constructs a mapping between two object's properties. Both properties are _both_ non-optional, and
+    /// are of the same type.
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int
+    /// }
+    ///
+    /// class RHS {
+    ///     var int: Int
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(\LHS.int, \RHS.int)
+    /// ]
+    /// ````
     public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
         self.boxedImpl = _PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
-    /// Constructs a mapping between two object's properties, where the properties
-    /// are of different types. Properties are _both_ non-optional.
-    /// - Parameters:
-    ///   - lhs: Left-hand side object's keypath
-    ///   - rhs: Right-hand side object's keypath
-    ///   - transformer: Transformer to use
-    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) {
-        self.boxedImpl = _PropertyMappingTransformerBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
-    }
-    
     /// Constructs a mapping between two object's properties. The lefr-hand side object's property
     /// is an optional.
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int?
+    /// }
+    ///
+    /// class RHS {
+    ///     var int: Int
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(\LHS.int, \RHS.int)
+    /// ]
+    /// ````
     public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
         self.boxedImpl = _PropertyMappingBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
@@ -48,6 +69,21 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int
+    /// }
+    ///
+    /// class RHS {
+    ///     var int: Int?
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(\LHS.int, \RHS.int)
+    /// ]
+    /// ````
     public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
         self.boxedImpl = _PropertyMappingBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
@@ -57,8 +93,139 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     /// - Parameters:
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int?
+    /// }
+    ///
+    /// class RHS {
+    ///     var int: Int?
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(\LHS.int, \RHS.int)
+    /// ]
+    /// ````
     public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
         self.boxedImpl = _PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
+    }
+    
+    /// Constructs a mapping between two object's properties, where the properties
+    /// are of different types. Properties are _both_ non-optional.
+    /// - Parameters:
+    ///   - lhs: Left-hand side object's keypath
+    ///   - rhs: Right-hand side object's keypath
+    ///   - transformer: Transformer to use
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int
+    /// }
+    ///
+    /// class RHS {
+    ///     var double: Double
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(
+    ///         \LHS.int,
+    ///         \RHS.double,
+    ///         transformer: PropertyTransformers.intDouble
+    ///     )
+    /// ]
+    /// ````
+    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) {
+        self.boxedImpl = _PropertyMappingTransformerBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
+    }
+    
+    /// Constructs a mapping between two object's properties, where the properties
+    /// are of different types. The left-hand side property is optional.
+    /// - Parameters:
+    ///   - lhs: Left-hand side object's keypath to optional property
+    ///   - rhs: Right-hand side object's keypath
+    ///   - transformer: Transformer to use
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int?
+    /// }
+    ///
+    /// class RHS {
+    ///     var double: Double
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(
+    ///         \LHS.int,
+    ///         \RHS.double,
+    ///         transformer: PropertyTransformers.intDouble
+    ///     )
+    /// ]
+    /// ````
+    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) {
+        self.boxedImpl = _PropertyMappingTransformerBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
+    }
+
+    /// Constructs a mapping between two object's properties, where the properties
+    /// are of different types. The right-hand side property is optional.
+    /// - Parameters:
+    ///   - lhs: Left-hand side object's keypath
+    ///   - rhs: Right-hand side object's keypath  to optional property
+    ///   - transformer: Transformer to use
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int
+    /// }
+    ///
+    /// class RHS {
+    ///     var double: Double?
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(
+    ///         \LHS.int,
+    ///         \RHS.double,
+    ///         transformer: PropertyTransformers.intDouble
+    ///     )
+    /// ]
+    /// ````
+    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV?>, transformer: PropertyTransformer<LV, RV>) {
+        self.boxedImpl = _PropertyMappingTransformerBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
+    }
+
+    /// Constructs a mapping between two object's properties, where the properties
+    /// are of different types. Both left-hand and right-hand side properties are optional.
+    /// - Parameters:
+    ///   - lhs: Left-hand side object's keypath
+    ///   - rhs: Right-hand side object's keypath  to optional property
+    ///   - transformer: Transformer to use
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int?
+    /// }
+    ///
+    /// class RHS {
+    ///     var double: Double?
+    /// }
+    ///
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(
+    ///         \LHS.int,
+    ///         \RHS.double,
+    ///         transformer: PropertyTransformers.intDouble
+    ///     )
+    /// ]
+    /// ````
+    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV?>, transformer: PropertyTransformer<LV, RV>) {
+        self.boxedImpl = _PropertyMappingTransformerBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
     
     /// Left-hand side keypath

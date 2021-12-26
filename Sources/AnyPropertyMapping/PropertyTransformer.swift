@@ -17,64 +17,25 @@ public enum PropertyTransformerError: Error {
 }
 
 
-public protocol AnyPropertyTransformer {
-
-    /// Transformation for adapt operation, returns nil if transformation failed
-    func _adapt(from: Any) throws -> Any
+public struct PropertyTransformer<LhsValue, RhsValue>: _AnyPropertyTransformer, _AnyPropertyTransformerOperations {
     
-    /// Transformation for apply operation, returns nil if transformation failed
-    func _apply(from: Any) throws -> Any
+    /// Construct a transformer with `adapt` and `apply` functions.
+    /// - Parameters:
+    ///   - adapt: `adapt` function
+    ///   - apply: `apply` function
+    public init(adapt: ((RhsValue) throws -> LhsValue)?, apply: ((LhsValue) throws -> RhsValue)?) {
+        self._adapt = adapt
+        self._apply = apply
+    }
     
     /// Returns the inverse of a transformer
-    func inverted() -> AnyPropertyTransformer
-    
-}
-
-public protocol AnyPropertyTransformerOperations {
-    
-    associatedtype LhsValue
-    associatedtype RhsValue
-    
-    /// Adapt operation accepting an RHS value, returning an LHS value.
-    /// The operation should throw `.invalidTransformation` when
-    /// the transformation failed.
-    var adapt: ((RhsValue) throws -> LhsValue)? { get }
-    
-    /// Adapt operation accepting an RHS value, returning an LHS value.
-    /// The operation should throw `.invalidTransformation` when
-    /// the transformation failed.
-    var apply: ((LhsValue) throws -> RhsValue)? { get }
-}
-
-
-public struct PropertyTransformer<LhsValue, RhsValue>: AnyPropertyTransformer, AnyPropertyTransformerOperations {
-    
-    public func _adapt(from: Any) throws -> Any {
-        guard let from = from as? RhsValue else {
-            throw PropertyTransformerError.invalidInput
-        }
-        guard let result = try self.adapt?(from) else {
-            throw PropertyTransformerError.invalidTransformation
-        }
-        return result
+    /// - Returns: Inverse transformer
+    public func inverted() -> PropertyTransformer<RhsValue, LhsValue> {
+        return PropertyTransformer<RhsValue, LhsValue>(adapt: self._apply, apply: self._adapt)
     }
     
-    public func _apply(from: Any) throws -> Any {
-        guard let from = from as? LhsValue else {
-            throw PropertyTransformerError.invalidInput
-        }
-        guard let result = try self.apply?(from) else {
-            throw PropertyTransformerError.invalidTransformation
-        }
-        return result
-    }
-    
-    public func inverted() -> AnyPropertyTransformer {
-        return PropertyTransformer<RhsValue, LhsValue>.init(adapt: self.apply, apply: self.adapt)
-    }
-    
-    public var adapt: ((RhsValue) throws -> LhsValue)?
-    public var apply: ((LhsValue) throws -> RhsValue)?
+    internal var _adapt: ((RhsValue) throws -> LhsValue)?
+    internal var _apply: ((LhsValue) throws -> RhsValue)?
 }
 
 
