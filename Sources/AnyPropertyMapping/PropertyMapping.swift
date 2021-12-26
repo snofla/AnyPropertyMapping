@@ -21,7 +21,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
-        self.boxedImpl = PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = _PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
     /// Constructs a mapping between two object's properties, where the properties
@@ -31,7 +31,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///   - rhs: Right-hand side object's keypath
     ///   - transformer: Transformer to use
     public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) {
-        self.boxedImpl = PropertyMappingTransformBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
+        self.boxedImpl = _PropertyMappingTransformerBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
     
     /// Constructs a mapping between two object's properties. The lefr-hand side object's property
@@ -40,7 +40,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
-        self.boxedImpl = PropertyMappingBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = _PropertyMappingBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Constructs a mapping between two object's properties. The right-hand side object's property
@@ -49,7 +49,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
-        self.boxedImpl = PropertyMappingBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = _PropertyMappingBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
     /// Constructs a mapping between two object's properties. Both left-hand side and  right-hand side object's
@@ -58,7 +58,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///   - lhs: Left-hand side object's keypath
     ///   - rhs: Right-hand side object's keypath
     public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
-        self.boxedImpl = PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
+        self.boxedImpl = _PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
     /// Left-hand side keypath
