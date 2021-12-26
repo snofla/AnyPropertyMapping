@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'AnyPropertyMapping'
-  s.version          = '1.0.1'
+  s.version          = '1.1.0'
   s.summary          = 'Maps properties of two classes using keypaths'
   s.homepage         = 'https://github.com/snofla/AnyPropertyMapping'
   s.license          = { :type => 'MIT', :file => 'LICENSE.md' }

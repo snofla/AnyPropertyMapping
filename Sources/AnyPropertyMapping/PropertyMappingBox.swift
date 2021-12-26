@@ -11,21 +11,22 @@ import Foundation
 /// mapping. It used as a base class for "concrete" generic class `PropertyMapping`
 /// and as a class to box the actual fowarded implementation of `PropertyMapping`
 /// to support optional properties.
-protocol PropertyMappingBox: AnyPropertyMapping {
+protocol _PropertyMappingBox: AnyPropertyMapping {
 
     /// Constraints (requirements)
     associatedtype Left: AnyObject
     associatedtype Right: AnyObject
-    associatedtype Value: Equatable
+    associatedtype LValue: Equatable
+    associatedtype RValue: Equatable
 
     /// Internal left keypath
-    var _leftKeyPath: WritableKeyPath<Left, Value> { get }
+    var _leftKeyPath: WritableKeyPath<Left, LValue> { get }
     /// Internal right keypath
-    var _rightKeyPath: WritableKeyPath<Right, Value> { get }
+    var _rightKeyPath: WritableKeyPath<Right, RValue> { get }
 }
 
 
-extension PropertyMappingBox {
+extension _PropertyMappingBox {
     
     // - MARK: public default implementation for AnyPropertyMapping conformance
     
@@ -47,24 +48,30 @@ extension PropertyMappingBox {
         return self.differs(_lhs, _rhs)
     }
     
-    public func inverted() -> AnyPropertyMapping {
-        fatalError("Never called, should be overloaded")
-    }
-
-    // - MARK: private default implementation
+    // - MARK: private default implementation. These are
+    // the default methods called when LValue == RValue == Value
     
     fileprivate func adapt(to lhs:  Left, from rhs: Right) {
+        assert(LValue.self == RValue.self)
+        assert((self._rightKeyPath as? WritableKeyPath<Right, LValue>) != nil)
+        let rkp = self._rightKeyPath as! WritableKeyPath<Right, LValue>
         var _lhs = lhs // need temp (Xcode 13)
-        _lhs[keyPath: self._leftKeyPath] = rhs[keyPath: self._rightKeyPath]
+        _lhs[keyPath: self._leftKeyPath] = rhs[keyPath: rkp]
     }
     
     fileprivate func apply(from lhs: Left, to rhs:  Right) {
+        assert(LValue.self == RValue.self)
+        assert((self._rightKeyPath as? WritableKeyPath<Right, LValue>) != nil)
+        let rkp = self._rightKeyPath as! WritableKeyPath<Right, LValue>
         var _rhs = rhs // need temp (Xcode 13)
-        _rhs[keyPath: self._rightKeyPath] = lhs[keyPath: self._leftKeyPath]
+        _rhs[keyPath: rkp] = lhs[keyPath: self._leftKeyPath]
     }
 
     fileprivate func differs(_ lhs: Left, _ rhs: Right) -> Bool {
-        return lhs[keyPath: self._leftKeyPath] != rhs[keyPath: self._rightKeyPath]
+        assert(LValue.self == RValue.self)
+        assert((self._rightKeyPath as? WritableKeyPath<Right, LValue>) != nil)
+        let rkp = self._rightKeyPath as! WritableKeyPath<Right, LValue>
+        return lhs[keyPath: self._leftKeyPath] != rhs[keyPath: rkp]
     }
     
     
