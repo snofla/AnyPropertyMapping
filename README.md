@@ -131,7 +131,7 @@ Here's an example of what a transformer for **Double** to **Int** looks like:
 
 ````swift
 class YourTransformers {
-		/// Converts a double to an int
+    /// Converts a double to an int
     public static let intDouble = PropertyTransformer<Int, Double>(adapt: { double in
         return Int(double.rounded())
     } apply: { int in
@@ -152,7 +152,7 @@ class B {
 }
 
 let mapping: [AnyPropertyMapping] = [
-		PropertyMapping(
+    PropertyMapping(
       \A.optionalInt, 
       \B.nonOptionalDouble, 
       transformer: YourTransformers.intDouble
@@ -177,7 +177,7 @@ To handle the inverse scenario, **PropertyTransformer** offers the **inverted()*
 ````swift
 // Map lhs B to rhs A
 let mappingBA: [AnyPropertyMapping] = [
-		PropertyMapping(
+    PropertyMapping(
       \B.nonOptionalDouble, 
       \A.optionalInt,       
       transformer: YourTransformers.intDouble.inverted()
@@ -187,7 +187,7 @@ let mappingBA: [AnyPropertyMapping] = [
 // NOTE 1: Another version would look like this, and inverts
 // an entire property mapping:
 let mappingBA_Alt1: [AnyPropertyMapping] = [
-		PropertyMapping(
+    PropertyMapping(
       \B.nonOptionalDouble, 
       \A.optionalInt,       
       transformer: YourTransformers.intDouble
@@ -197,7 +197,7 @@ let mappingBA_Alt1: [AnyPropertyMapping] = [
 // NOTE 2: Yet another version would look like this, and inverts
 // the entire array of property mappings:
 let mappingBA_Alt2: [AnyPropertyMapping] = [
-		PropertyMapping(
+    PropertyMapping(
       \B.nonOptionalDouble, 
       \A.optionalInt,       
       transformer: YourTransformers.intDouble
