@@ -4,7 +4,23 @@
 ![Build](https://github.com/snofla/AnyPropertyMapping/actions/workflows/swift.yml/badge.svg)
 ![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)
 
-[TOC]
+
+<!--ts-->
+* [AnyPropertyMapping](#anypropertymapping)
+   * [Installation](#installation)
+   * [Usage](#usage)
+      * [Simplest case: mapping object properties of the same type](#simplest-case-mapping-object-properties-of-the-same-type)
+      * [General case: mapping object properties of different types](#general-case-mapping-object-properties-of-different-types)
+   * [Convenience functions](#convenience-functions)
+   * [Notes](#notes)
+   * [Author(s)](#authors)
+   * [Thanks](#thanks)
+   * [License](#license)
+
+<!-- Added by: alfons, at: Sun Dec 26 18:27:52 CET 2021 -->
+
+<!--te-->
+
 
 AnyPropertyMapping provides a convenient way to map properties of class types, and perform operations on instances of them, in both directions. The mapping is entirely based on keypaths. Optional properties are supported out of the box. Since the library depends heavily on keypaths: if the keypath syntax supports it, the library will support it.
 
