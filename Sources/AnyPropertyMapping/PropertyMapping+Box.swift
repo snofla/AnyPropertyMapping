@@ -91,7 +91,7 @@ extension PropertyMapping {
         }
         
         public func inverted() -> AnyPropertyMapping {
-            return PropertyMapping<R, L, LValue, RValue>._PropertyMappingBoxOptionalRhs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._realLeftKeyPath)
+            return PropertyMapping<R, L>._PropertyMappingBoxOptionalRhs<R, L, V>.init(leftKeyPath: self._rightKeyPath, rightKeyPath: self._realLeftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
@@ -154,7 +154,7 @@ extension PropertyMapping {
         }
         
         public func inverted() -> AnyPropertyMapping {
-            return PropertyMapping<R, L, LValue, RValue>._PropertyMappingBoxOptionalLhs<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._leftKeyPath)
+            return PropertyMapping<R, L>._PropertyMappingBoxOptionalLhs<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._leftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
@@ -211,7 +211,7 @@ extension PropertyMapping {
         }
         
         public func inverted() -> AnyPropertyMapping {
-            return PropertyMapping<R, L, LValue, RValue>._PropertyMappingBoxOptionalBoth<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._realLeftKeyPath)
+            return PropertyMapping<R, L>._PropertyMappingBoxOptionalBoth<R, L, V>.init(leftKeyPath: self._realRighKeyPath, rightKeyPath: self._realLeftKeyPath)
         }
         
         var leftKeyPath: AnyKeyPath {
