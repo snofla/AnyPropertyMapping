@@ -14,6 +14,17 @@ public protocol DefaultConstructable {
 }
 
 
+// Optional is a special case, and doesn't have a default constructor
+extension Optional: DefaultConstructable where Wrapped: DefaultConstructable {
+    
+    /// Adds a default constructor for `Optional`, where  it is assigned`.some` with the default value
+    /// for the `Wrapped` type (where `Wrapped` conforms to `DefaultConstructable`).
+    public init() {
+        self = .some(Wrapped())
+    }
+
+}
+
 
 // Scalars
 extension Bool: DefaultConstructable {}
