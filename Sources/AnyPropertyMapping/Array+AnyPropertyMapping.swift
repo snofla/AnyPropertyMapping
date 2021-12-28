@@ -8,7 +8,7 @@
 import Foundation
 
 
-extension Sequence where Element == AnyPropertyMapping {
+extension Array where Element == AnyPropertyMapping {
     
     /// Applies mapping to two objects
     ///
@@ -178,11 +178,11 @@ extension Sequence where Element == AnyPropertyMapping {
 }
 
 
-extension Sequence {
+extension Array {
     
     /// Applies mappings to an array of tuples
     @discardableResult
-    public func apply<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Self where Element == (L, R), S.Element == AnyPropertyMapping {
+    public func apply<L: AnyObject, R: AnyObject>(mappings: Array<AnyPropertyMapping>) -> Self where Element == (L, R) {
         self.forEach { tuple in
             mappings.apply(from: tuple.0, to: tuple.1)
         }
@@ -190,7 +190,7 @@ extension Sequence {
     }
 
     @discardableResult
-    public func adapt<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Self where Element == (L, R), S.Element == AnyPropertyMapping {
+    public func adapt<L: AnyObject, R: AnyObject>(mappings: Array<AnyPropertyMapping>) -> Self where Element == (L, R) {
         self.forEach { tuple in
             mappings.adapt(to: tuple.0, from: tuple.1)
         }
@@ -207,7 +207,7 @@ extension Sequence {
     ///     .map { ($0.0, $0.1) }
     ///     .differs(mappings: someMappings)
     /// ````
-    public func differs<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Bool where Element == (L, R), S.Element == AnyPropertyMapping {
+    public func differs<L: AnyObject, R: AnyObject>(mappings: Array<AnyPropertyMapping>) -> Bool where Element == (L, R) {
         guard let _ = self.first(where: { tuple in
             return mappings.differs(tuple.0, tuple.1) == true
         }) else {
