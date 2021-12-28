@@ -58,5 +58,14 @@ class AnyPropertyMappingTypeSafetyTests: XCTestCase {
         XCTAssertNotNil(mapping1 as? [PropertyMapping<A, B>], "Type safety check")
     }
 
+    func test_Optional_Default_Constructable() {
+        let i: Int? = 2
+        XCTAssertNotNil(i, "i is not nil")
+        let j: Int? = nil
+        XCTAssertNil(j, "j is nil")
+        let k: Int? = Int?()
+        XCTAssertNotNil(k, "k is not nil")
+        XCTAssert(k! == 0, "k should have default value 0, because Int is default constructable")
+    }
 
 }
