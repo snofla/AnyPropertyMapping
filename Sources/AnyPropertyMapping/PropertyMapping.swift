@@ -265,3 +265,16 @@ extension PropertyMapping {
     
 }
 
+
+extension PropertyMapping: Hashable {
+    
+    public static func == (lhs: PropertyMapping<L, R>, rhs: PropertyMapping<L, R>) -> Bool {
+        return lhs.leftKeyPath == rhs.leftKeyPath && lhs.rightKeyPath == rhs.rightKeyPath
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.leftKeyPath)
+        hasher.combine(self.rightKeyPath)
+    }
+    
+}
