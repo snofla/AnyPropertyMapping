@@ -42,6 +42,15 @@ let defaultMappings: [AnyPropertyMapping] = [
     PropertyMapping(\A.optW, \B.optWW)
 ]
 
+let defaultMappingsTS = [
+    PropertyMapping(\A.i, \B.ii),
+    PropertyMapping(\A.j, \B.jj),
+    PropertyMapping(\A.t, \B.tt),
+    PropertyMapping(\A.u, \B.optU),
+    PropertyMapping(\A.optV, \B.vv),
+    PropertyMapping(\A.optW, \B.optWW)
+]
+
 
 let defaultEqualityMappingForB: [AnyPropertyMapping] = [
     PropertyMapping(\B.ii, \B.ii),
@@ -61,6 +70,16 @@ let defaultEqualityMappingForA: [AnyPropertyMapping] = [
     PropertyMapping(\A.optV, \A.optV),
     PropertyMapping(\A.optW, \A.optW)
 ]
+
+let defaultEqualityMappingForATS: [PropertyMapping<A, A>] = [
+    PropertyMapping(\A.i, \A.i),
+    PropertyMapping(\A.j, \A.j),
+    PropertyMapping(\A.t, \A.t),
+    PropertyMapping(\A.u, \A.u),
+    PropertyMapping(\A.optV, \A.optV),
+    PropertyMapping(\A.optW, \A.optW)
+]
+
 
 func invertedMappingAdaptApplyIsEqual(with mapping: AnyPropertyMapping) -> Bool  {
     let mappingAB = mapping
@@ -91,7 +110,7 @@ func defaultTupleArray() -> [(A, B)] {
     return result
 }
 
-func equal(_ a: [A], b: [B]) -> Bool {
+func equal(_ a: [A], _ b: [B]) -> Bool {
     guard a.count == b.count else {
         return false
     }
@@ -100,6 +119,24 @@ func equal(_ a: [A], b: [B]) -> Bool {
     }
     let differences = a.enumerated().reduce(0) { result, item in
         if defaultMappings.differs(item.element, b[item.offset]) {
+            return result + 1
+        } else {
+            return result
+        }
+    }
+    return differences == 0
+}
+
+func equalTS(_ a: [A], _ b: [B]) -> Bool {
+    guard a.count == b.count else {
+        return false
+    }
+    guard a.count != 0 else {
+        return true
+    }
+    let mappingSet = Set<PropertyMapping>(defaultMappingsTS)
+    let differences = a.enumerated().reduce(0) { result, item in
+        if mappingSet.differs(item.element, b[item.offset]) {
             return result + 1
         } else {
             return result
