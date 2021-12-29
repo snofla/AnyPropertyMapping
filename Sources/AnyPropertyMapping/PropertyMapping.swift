@@ -238,7 +238,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
         return self.boxedImpl.rightKeyPath
     }
     
-    private let boxedImpl: AnyPropertyMapping
+    internal let boxedImpl: AnyPropertyMapping
 }
 
 
