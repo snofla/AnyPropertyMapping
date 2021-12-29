@@ -1,15 +1,15 @@
 //
-//  Sequence+AnyPropertyMapping.swift
-//  AnyPropertyMapping
+//  Array+PropertyMapping.swift
+//  
 //
-//  Created by Alfons Hoogervorst on 18/12/2021.
+//  Created by Alfons Hoogervorst on 28/12/2021.
 //
 
 import Foundation
 
 
-extension Sequence where Element == AnyPropertyMapping {
-    
+extension Sequence {
+        
     /// Applies mapping to two objects
     ///
     /// Example:
@@ -17,18 +17,18 @@ extension Sequence where Element == AnyPropertyMapping {
     /// ````
     /// let a = Object1()
     /// let b = Object2()
-    /// let mappings: [AnyPropertyMapping] = [
+    /// let mappings = [
     ///     PropertyMapping(\Object1.field1, \Object2.field1),
     ///     PropertyMapping(\Object1.field2, \Object2.field2)
     /// ]
     /// mappings.apply(from: a, to: b)
     /// ````
-    public func apply<L: AnyObject, R: AnyObject>(from lhs: L, to rhs: R) {
+    public func apply<L: AnyObject, R: AnyObject>(from lhs: L, to rhs: R) where Self.Element == PropertyMapping<L, R> {
         self.forEach { mapping in
             mapping.apply(from: lhs, to: rhs)
         }
     }
-    
+
     /// Adapts mapping to two object
     ///
     /// Example:
@@ -36,13 +36,13 @@ extension Sequence where Element == AnyPropertyMapping {
     /// ````
     /// let a = Object1()
     /// let b = Object2()
-    /// let mappings: [AnyPropertyMapping] = [
+    /// let mappings = [
     ///     PropertyMapping(\Object1.field1, \Object2.field1),
     ///     PropertyMapping(\Object1.field2, \Object2.field2)
     /// ]
     /// mappings.adapt(to: a, from: b)
     /// ````
-    public func adapt<L: AnyObject, R: AnyObject>(to lhs: L, from rhs: R) {
+    public func adapt<L: AnyObject, R: AnyObject>(to lhs: L, from rhs: R) where Self.Element == PropertyMapping<L, R> {
         self.forEach { mapping in
             mapping.adapt(to: lhs, from: rhs)
         }
@@ -56,13 +56,13 @@ extension Sequence where Element == AnyPropertyMapping {
     /// ````
     /// let a = Object1()
     /// let b = Object2()
-    /// let mappings: [AnyPropertyMapping] = [
+    /// let mappings = [
     ///     PropertyMapping(\Object1.field1, \Object2.field1),
     ///     PropertyMapping(\Object1.field2, \Object2.field2)
     /// ]
     /// mappings.differs(a, b) // true if objects differ according to mapping
     /// ````
-    public func differs<L: AnyObject, R: AnyObject>(_ lhs: L, _ rhs: R) -> Bool {
+    public func differs<L: AnyObject, R: AnyObject>(_ lhs: L, _ rhs: R) -> Bool where Self.Element == PropertyMapping<L, R> {
         guard let _ = self.first(where: { mapping in
             return mapping.differs(lhs, rhs) == true
         }) else {
@@ -71,7 +71,15 @@ extension Sequence where Element == AnyPropertyMapping {
         return true
     }
     
-    public func differences<L: AnyObject, R: AnyObject>(_ lhs: L, _ rhs: R) -> Array<(left: AnyKeyPath, right: AnyKeyPath)>? {
+    /// Returns the keypaths differences between two objects L and R as an array of
+    /// tuples. L and R refer to objects of different types.
+    /// - Parameters:
+    ///   - lhs: Left-hand side object
+    ///   - rhs: Right-hand side object
+    /// - Returns: An array of tuples, where a tuple's `left` and `right` properties
+    /// have the keypaths for the properties where the left-hand and right-hand side
+    /// objects differ.
+    public func differences<L: AnyObject, R: AnyObject>(_ lhs: L, _ rhs: R) -> Array<(left: AnyKeyPath, right: AnyKeyPath)>? where Self.Element == PropertyMapping<L, R> {
         let diffs = self.compactMap { (mapping) -> (left: AnyKeyPath, right: AnyKeyPath)? in
             guard mapping.differs(lhs, rhs) else {
                 return nil
@@ -81,7 +89,23 @@ extension Sequence where Element == AnyPropertyMapping {
         return diffs.isEmpty ? nil : diffs
     }
     
-    public func differencesIndex<L: AnyObject, R: AnyObject>(_ lhs: L, _ rhs: R) -> IndexSet {
+    /// Returns the keypaths differences as an array of
+    /// keypaths. L and R refer to objects of the same type.
+    /// - Parameters:
+    ///   - lhs: Left-hand side object
+    ///   - rhs: Right-hand side object
+    /// - Returns: An array of keypaths
+    public func differences<L: AnyObject>(_ lhs: L, _ rhs: L) -> Array<AnyKeyPath>? where Self.Element == PropertyMapping<L, L> {
+        let diffs = self.compactMap { (mapping) -> AnyKeyPath? in
+            guard mapping.differs(lhs, rhs) else {
+                return nil
+            }
+            return mapping.leftKeyPath
+        }
+        return diffs.isEmpty ? nil : diffs
+    }
+    
+    public func differencesIndex<L: AnyObject, R: AnyObject>(_ lhs: L, _ rhs: R) -> IndexSet where Self.Element == PropertyMapping<L, R> {
         let diffIndices = self.enumerated().reduce(into: IndexSet()) { partialResult, item in
             let (index, mapping) = item
             if mapping.differs(lhs, rhs) {
@@ -92,7 +116,7 @@ extension Sequence where Element == AnyPropertyMapping {
     }
     
     /// Returns the inverse of a mapping sequence
-    public func inverted() -> [Element] {
+    public func inverted<L: AnyObject, R: AnyObject>() -> [AnyPropertyMapping] where Self.Element == PropertyMapping<L, R> {
         return self.map { mapping in
             return mapping.inverted()
         }
@@ -106,13 +130,13 @@ extension Sequence where Element == AnyPropertyMapping {
     /// ````
     /// let a: [Object1] = [Object1(), Object1(), Object1()]
     /// let b: [Object2] = [Object2(), Object2(), Object2()]
-    /// let mappings: [AnyPropertyMapping] = [
+    /// let mappings = [
     ///     PropertyMapping(\Object1.field1, \Object2.field1),
     ///     PropertyMapping(\Object1.field2, \Object2.field2)
     /// ]
     /// mappings.apply(from: a, to: b)
     /// ````
-    public func apply<L: AnyObject, R: AnyObject>(from lhs: Array<L>, to rhs: Array<R>) {
+    public func apply<L: AnyObject, R: AnyObject>(from lhs: Array<L>, to rhs: Array<R>) where Self.Element == PropertyMapping<L, R> {
         guard lhs.count != 0 && rhs.count != 0 else {
             return
         }
@@ -130,13 +154,13 @@ extension Sequence where Element == AnyPropertyMapping {
     /// ````
     /// let a: [Object1] = [Object1(), Object1(), Object1()]
     /// let b: [Object2] = [Object2(), Object2(), Object2()]
-    /// let mappings: [AnyPropertyMapping] = [
+    /// let mappings = [
     ///     PropertyMapping(\Object1.field1, \Object2.field1),
     ///     PropertyMapping(\Object1.field2, \Object2.field2)
     /// ]
     /// mappings.adapt(to: a, from: b)
     /// ````
-    public func adapt<L: AnyObject, R: AnyObject>(to lhs: Array<L>, from rhs: Array<R>) {
+    public func adapt<L: AnyObject, R: AnyObject>(to lhs: Array<L>, from rhs: Array<R>) where Self.Element == PropertyMapping<L, R> {
         guard lhs.count != 0 && rhs.count != 0 else {
             return
         }
@@ -145,7 +169,7 @@ extension Sequence where Element == AnyPropertyMapping {
             self.adapt(to: lhs[i], from: rhs[i])
         }
     }
-    
+
     /// Returns `true` if two arrays of objects differ from each other using the current mapping
     /// - Returns: `true` if objects differ
     ///
@@ -154,13 +178,13 @@ extension Sequence where Element == AnyPropertyMapping {
     /// ````
     /// let a = [Object1(), Object1(), Object1()]
     /// let b = [Object2(), Object2(), Object2()]
-    /// let mappings: [AnyPropertyMapping] = [
+    /// let mappings = [
     ///     PropertyMapping(\Object1.field1, \Object2.field1),
     ///     PropertyMapping(\Object1.field2, \Object2.field2)
     /// ]
     /// mappings.differs(a, b) // true if objects differ according to mapping
     /// ````
-    public func differs<L: AnyObject, R: AnyObject>(_ lhs: Array<L>, _ rhs: Array<R>) -> Bool {
+    public func differs<L: AnyObject, R: AnyObject>(_ lhs: Array<L>, _ rhs: Array<R>) -> Bool where Self.Element == PropertyMapping<L, R> {
         guard lhs.count != 0 && rhs.count != 0 else {
             return false
         }
@@ -169,47 +193,6 @@ extension Sequence where Element == AnyPropertyMapping {
         }
         guard let _ = zip(lhs, rhs).first(where: { tuple in
             return self.differs(tuple.0, tuple.1) == true
-        }) else {
-            return false
-        }
-        return true
-    }
-    
-}
-
-
-extension Sequence {
-    
-    /// Applies mappings to an array of tuples
-    @discardableResult
-    public func apply<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Self where Element == (L, R), S.Element == AnyPropertyMapping {
-        self.forEach { tuple in
-            mappings.apply(from: tuple.0, to: tuple.1)
-        }
-        return self
-    }
-
-    @discardableResult
-    public func adapt<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Self where Element == (L, R), S.Element == AnyPropertyMapping {
-        self.forEach { tuple in
-            mappings.adapt(to: tuple.0, from: tuple.1)
-        }
-        return self
-    }
-    
-    /// Checks whether an array of tuples of LHS and RHS elements differs according to a mapping
-    /// - Parameter mappings: Mapping to test array of LHS and RHS elements
-    /// - Returns: `true` if any of the elements in the tuples array is different
-    ///
-    /// Example:
-    ///````
-    /// zip([Object1(), Object1()], [Object2(), Object2()]
-    ///     .map { ($0.0, $0.1) }
-    ///     .differs(mappings: someMappings)
-    /// ````
-    public func differs<L: AnyObject, R: AnyObject, S: Sequence>(mappings: S) -> Bool where Element == (L, R), S.Element == AnyPropertyMapping {
-        guard let _ = self.first(where: { tuple in
-            return mappings.differs(tuple.0, tuple.1) == true
         }) else {
             return false
         }

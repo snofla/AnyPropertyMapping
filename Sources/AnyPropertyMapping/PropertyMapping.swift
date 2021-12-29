@@ -10,7 +10,7 @@ import Foundation
 /// Sets up a mapping between two properties of two different classes. This is used as
 /// a concrete generic implementation. Swift's type inference will make sure the correct
 /// constructor is chosen depending on the use of the class.
-public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & DefaultConstructable, RV: Equatable & DefaultConstructable>: AnyPropertyMapping  {
+public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMapping  {
     
     // Implementation: we forward operations to a box class,
     // each having a different constructor to support optionals in
@@ -36,7 +36,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     PropertyMapping(\LHS.int, \RHS.int)
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
+    public init<V>(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V>) where V: (Equatable & DefaultConstructable) {
         self.boxedImpl = _PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
@@ -60,7 +60,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     PropertyMapping(\LHS.int, \RHS.int)
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV>) where LV == RV {
+    public init<V>(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V>) where V: (Equatable & DefaultConstructable)  {
         self.boxedImpl = _PropertyMappingBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
@@ -84,7 +84,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     PropertyMapping(\LHS.int, \RHS.int)
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
+    public init<V>(_ lhs: WritableKeyPath<L, V>, _ rhs: WritableKeyPath<R, V?>) where V: (Equatable & DefaultConstructable) {
         self.boxedImpl = _PropertyMappingBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs)
     }
 
@@ -108,7 +108,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     PropertyMapping(\LHS.int, \RHS.int)
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV?>) where LV == RV {
+    public init<V>(_ lhs: WritableKeyPath<L, V?>, _ rhs: WritableKeyPath<R, V?>) where V: (Equatable & DefaultConstructable) {
         self.boxedImpl = _PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs)
     }
     
@@ -137,7 +137,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     )
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) {
+    public init<LV, RV>(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) where LV: (Equatable & DefaultConstructable), RV: (Equatable & DefaultConstructable) {
         self.boxedImpl = _PropertyMappingTransformerBoxAsIs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
     
@@ -166,7 +166,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     )
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) {
+    public init<LV, RV>(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV>, transformer: PropertyTransformer<LV, RV>) where LV: (Equatable & DefaultConstructable), RV: (Equatable & DefaultConstructable) {
         self.boxedImpl = _PropertyMappingTransformerBoxOptionalLhs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
 
@@ -195,7 +195,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     )
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV?>, transformer: PropertyTransformer<LV, RV>) {
+    public init<LV, RV>(_ lhs: WritableKeyPath<L, LV>, _ rhs: WritableKeyPath<R, RV?>, transformer: PropertyTransformer<LV, RV>) where LV: (Equatable & DefaultConstructable), RV: (Equatable & DefaultConstructable) {
         self.boxedImpl = _PropertyMappingTransformerBoxOptionalRhs(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
 
@@ -224,7 +224,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
     ///     )
     /// ]
     /// ````
-    public init(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV?>, transformer: PropertyTransformer<LV, RV>) {
+    public init<LV, RV>(_ lhs: WritableKeyPath<L, LV?>, _ rhs: WritableKeyPath<R, RV?>, transformer: PropertyTransformer<LV, RV>) where LV: (Equatable & DefaultConstructable), RV: (Equatable & DefaultConstructable) {
         self.boxedImpl = _PropertyMappingTransformerBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
     
@@ -238,7 +238,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject, LV: Equatable & D
         return self.boxedImpl.rightKeyPath
     }
     
-    private let boxedImpl: AnyPropertyMapping
+    internal let boxedImpl: AnyPropertyMapping
 }
 
 
@@ -265,3 +265,16 @@ extension PropertyMapping {
     
 }
 
+
+extension PropertyMapping: Hashable {
+    
+    public static func == (lhs: PropertyMapping<L, R>, rhs: PropertyMapping<L, R>) -> Bool {
+        return lhs.leftKeyPath == rhs.leftKeyPath && lhs.rightKeyPath == rhs.rightKeyPath
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.leftKeyPath)
+        hasher.combine(self.rightKeyPath)
+    }
+    
+}

@@ -19,18 +19,16 @@ extension PropertyMapping {
 
 extension PropertyMapping {
     
-    // Overloads that will never be called
-    
     func adapt(to lhs: L, from rhs: R) {
-        fatalError("Never called")
+        self.boxedImpl.adapt(to: lhs, from: rhs)
     }
         
     func apply(from lhs: L, to rhs: R) {
-        fatalError("Never called")
+        self.boxedImpl.apply(from: lhs, to: rhs)
     }
     
     func differs(_ lhs: L, _ rhs: R) -> Bool {
-        fatalError("Never called")
+        return self.boxedImpl.differs(lhs, rhs)
     }
     
 }
