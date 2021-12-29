@@ -104,7 +104,7 @@ class AnyPropertyMappingTests: XCTestCase {
     }
     
     
-    func test_Sequence_Apply_Differs() {
+    func test_Array_Apply_Differs() {
         let a = A()
         let b = B()
         let bb = B()
@@ -129,7 +129,7 @@ class AnyPropertyMappingTests: XCTestCase {
     }
     
     
-    func test_Sequence_Adapt_Differs() {
+    func test_Array_Adapt_Differs() {
         let a = A()
         let b = B()
         let aa = A()
@@ -206,7 +206,7 @@ class AnyPropertyMappingTests: XCTestCase {
         XCTAssert(a.optInt == nil, "A() should have received nil")
     }
     
-    func test_Mapping_Sequence_Differences() {
+    func test_Mapping_Array_Differences() {
         let a = A()
         let b = B()
         // make a == b according to mapping
@@ -221,7 +221,7 @@ class AnyPropertyMappingTests: XCTestCase {
         }
     }
     
-    func test_Mapping_Sequence_DifferencesIndex() {
+    func test_Mapping_Array_DifferencesIndex() {
         let a = A()
         let b = B()
         // make a == b according to mapping
@@ -253,14 +253,14 @@ class AnyPropertyMappingTests: XCTestCase {
         var a = copyA
         let b = copyB
         defaultMappings.adapt(to: emptyA, from: emptyB)
-        XCTAssert(equal(emptyA, b: emptyB), "Empty")
+        XCTAssert(equal(emptyA, emptyB), "Empty")
         defaultMappings.adapt(to: a, from: b)
-        XCTAssert(equal(a, b: b), "a == b")
+        XCTAssert(equal(a, b), "a == b")
         defaultMappings.apply(from: emptyA, to: emptyB)
-        XCTAssert(equal(emptyA, b: emptyB), "Empty")
+        XCTAssert(equal(emptyA, emptyB), "Empty")
         a = copyA
         defaultMappings.apply(from: a, to: b)
-        XCTAssert(equal(a, b: b), "a == b")
+        XCTAssert(equal(a, b), "a == b")
     }
     
     func test_Adapt_Apply_Tuples_Array() {
@@ -278,13 +278,13 @@ class AnyPropertyMappingTests: XCTestCase {
         let newA = tuples.map { a_ in
             return a_.0
         }
-        XCTAssert(equal(newA, b: arrayB), "a == b")
+        XCTAssert(equal(newA, arrayB), "a == b")
         tuples = copyAB
         tuples.apply(mappings: defaultMappings)
         let newB = tuples.map { _b in
             return _b.1
         }
-        XCTAssert(equal(arrayA, b: newB), "a == b")
+        XCTAssert(equal(arrayA, newB), "a == b")
     }
     
     func test_Differs_Mapping_With_Array() {
