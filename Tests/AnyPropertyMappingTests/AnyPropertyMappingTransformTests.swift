@@ -21,6 +21,18 @@ class AnyPropertyMappingTransformTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
     
+    func test_Simple_KeyPaths_Tests() {
+        let nonOptionals = PropertyMapping(\A.i, \B.xx, transformer: PropertyTransformers.intDouble)
+        XCTAssert(nonOptionals.leftKeyPath == \A.i && nonOptionals.rightKeyPath == \B.xx)
+        let optionalLhs = PropertyMapping(\A.optV, \B.xx, transformer: PropertyTransformers.intDouble)
+        XCTAssert(optionalLhs.leftKeyPath == \A.optV && optionalLhs.rightKeyPath == \B.xx)
+        let optionalRhs = PropertyMapping(\A.i, \B.optWW, transformer: PropertyTransformers.intDouble)
+        XCTAssert(optionalRhs.leftKeyPath == \A.i && optionalRhs.rightKeyPath == \B.optWW)
+        let optionalBoth = PropertyMapping(\A.optV, \B.optWW, transformer: PropertyTransformers.intDouble)
+        XCTAssert(optionalBoth.leftKeyPath == \A.optV && optionalBoth.rightKeyPath == \B.optWW)
+    }
+
+    
     func test_Int_String_Transformation_Failure() {
         class A {
             var int: Int = 10

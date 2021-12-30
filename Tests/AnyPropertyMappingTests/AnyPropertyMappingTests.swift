@@ -18,6 +18,17 @@ class AnyPropertyMappingTests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    func test_Simple_KeyPaths_Tests() {
+        let nonOptionals = PropertyMapping(\A.i, \B.ii)
+        XCTAssert(nonOptionals.leftKeyPath == \A.i && nonOptionals.rightKeyPath == \B.ii)
+        let optionalLhs = PropertyMapping(\A.optV, \B.vv)
+        XCTAssert(optionalLhs.leftKeyPath == \A.optV && optionalLhs.rightKeyPath == \B.vv)
+        let optionalRhs = PropertyMapping(\A.u, \B.optU)
+        XCTAssert(optionalRhs.leftKeyPath == \A.u && optionalRhs.rightKeyPath == \B.optU)
+        let optionalBoth = PropertyMapping(\A.optW, \B.optWW)
+        XCTAssert(optionalBoth.leftKeyPath == \A.optW && optionalBoth.rightKeyPath == \B.optWW)
+    }
 
     func test_Adapt_B_From_A() throws {
         let source = B()
