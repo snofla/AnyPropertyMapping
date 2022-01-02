@@ -19,14 +19,17 @@ extension PropertyMapping {
 
 extension PropertyMapping {
     
-    func adapt(to lhs: L, from rhs: R) {
-        self.boxedImpl.adapt(to: lhs, from: rhs)
-    }
-        
-    func apply(from lhs: L, to rhs: R) {
-        self.boxedImpl.apply(from: lhs, to: rhs)
+    @discardableResult
+    func adapt(to lhs: L, from rhs: R) -> L {
+        return self.boxedImpl.adapt(to: lhs, from: rhs) as! L
     }
     
+    @discardableResult
+    func apply(from lhs: L, to rhs: R) -> R {
+        return self.boxedImpl.apply(from: lhs, to: rhs) as! R
+    }
+    
+    @discardableResult
     func differs(_ lhs: L, _ rhs: R) -> Bool {
         return self.boxedImpl.differs(lhs, rhs)
     }

@@ -65,21 +65,23 @@ extension PropertyMapping {
             self._rightKeyPath = rightKeyPath
         }
 
-        public func adapt(to lhs: Any, from rhs: Any) {
+        public func adapt(to lhs: Any, from rhs: Any) -> Any {
             PropertyMapping.testArguments(#function, lhs, rhs)
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning non optional (rhs) to optional (lhs) is always possible
             _lhs[keyPath: self._realLeftKeyPath] = _rhs[keyPath: self._rightKeyPath]
+            return _lhs
         }
         
-        public func apply(from lhs: Any, to rhs:  Any) {
+        public func apply(from lhs: Any, to rhs:  Any) -> Any {
             PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning optional value (lhs) to non-optional (rhs) is not
             // allowed: use the default value
             _rhs[keyPath: self._rightKeyPath] = _lhs[keyPath: self._realLeftKeyPath] ?? V()
+            return _rhs
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
@@ -129,20 +131,22 @@ extension PropertyMapping {
             self._realRighKeyPath = rightKeyPath
         }
 
-        public func adapt(to lhs: Any, from rhs: Any) {
+        public func adapt(to lhs: Any, from rhs: Any) -> Any {
             PropertyMapping.testArguments(#function, lhs, rhs)
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning optional to non-optional requires a default value
             _lhs[keyPath: self._leftKeyPath] = _rhs[keyPath: self._realRighKeyPath] ?? V()
+            return _lhs
         }
         
-        public func apply(from lhs: Any, to rhs:  Any) {
+        public func apply(from lhs: Any, to rhs:  Any) -> Any {
             PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning non-optional to optional is always possible
             _rhs[keyPath: self._realRighKeyPath] = _lhs[keyPath: self._leftKeyPath]
+            return _rhs
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
@@ -186,20 +190,22 @@ extension PropertyMapping {
             self._realRighKeyPath = rightKeyPath
         }
 
-        public func adapt(to lhs: Any, from rhs: Any) {
+        public func adapt(to lhs: Any, from rhs: Any) -> Any {
             PropertyMapping.testArguments(#function, lhs, rhs)
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning non-optional to non-optional is always possible
             _lhs[keyPath: self._realLeftKeyPath] = _rhs[keyPath: self._realRighKeyPath]
+            return _lhs
         }
         
-        public func apply(from lhs: Any, to rhs:  Any) {
+        public func apply(from lhs: Any, to rhs:  Any) -> Any {
             PropertyMapping.testArguments(#function, lhs, rhs)
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning non-optional to non-optional is always possible
             _rhs[keyPath: self._realRighKeyPath] = _lhs[keyPath: self._realLeftKeyPath]
+            return _rhs
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {

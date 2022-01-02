@@ -23,22 +23,24 @@ extension PropertyMapping {
             self._transformer = transformer
         }
         
-        func adapt(to lhs: Any, from rhs: Any) {
+        func adapt(to lhs: Any, from rhs: Any) -> Any {
             var lhs = lhs as! Left
             let rhs = rhs as! Right
             guard let transformedLhsValue = try? self._transformer._adapt(from: rhs[keyPath: self._rightKeyPath]) as? LValue else {
-                return
+                return lhs
             }
             lhs[keyPath: self._leftKeyPath] = transformedLhsValue
+            return lhs
         }
         
-        func apply(from lhs: Any, to rhs: Any) {
+        func apply(from lhs: Any, to rhs: Any) -> Any {
             let lhs = lhs as! Left
             var rhs = rhs as! Right
             guard let transformedRhsValue = try? self._transformer._apply(from: lhs[keyPath: self._leftKeyPath]) as? RValue else {
-                return
+                return rhs
             }
             rhs[keyPath: self._rightKeyPath] = transformedRhsValue
+            return rhs
         }
         
         func differs(_ lhs: Any, _ rhs: Any) -> Bool {
@@ -90,24 +92,26 @@ extension PropertyMapping {
             self._transformer = transformer
         }
 
-        public func adapt(to lhs: Any, from rhs: Any) {
+        public func adapt(to lhs: Any, from rhs: Any) -> Any {
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             guard let transformedLhsValue = try? self._transformer._adapt(from: _rhs[keyPath: self._rightKeyPath]) as? LValue else {
-                return
+                return _lhs
             }
             _lhs[keyPath: self._realLeftKeyPath] = transformedLhsValue
+            return _lhs
         }
         
-        public func apply(from lhs: Any, to rhs:  Any) {
+        public func apply(from lhs: Any, to rhs:  Any) -> Any {
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning optional value (lhs) to non-optional (rhs) is not
             // allowed: use the default value
             guard let transformedRhsValue = try? self._transformer._apply(from: _lhs[keyPath: self._realLeftKeyPath] ?? LValue()) as? RValue else {
-                return
+                return _rhs
             }
             _rhs[keyPath: self._rightKeyPath] = transformedRhsValue
+            return _rhs
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
@@ -164,24 +168,26 @@ extension PropertyMapping {
             self._transformer = transformer
         }
 
-        public func adapt(to lhs: Any, from rhs: Any) {
+        public func adapt(to lhs: Any, from rhs: Any) -> Any {
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning optional to non-optional requires a default value
             guard let transformedLhsValue = try? self._transformer._adapt(from: _rhs[keyPath: self._realRighKeyPath] ?? RValue()) as? LValue else {
-                return
+                return _lhs
             }
             _lhs[keyPath: self._leftKeyPath] = transformedLhsValue
+            return _lhs
         }
         
-        public func apply(from lhs: Any, to rhs:  Any) {
+        public func apply(from lhs: Any, to rhs:  Any) -> Any {
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning non-optional to optional is always possible
             guard let transformedRhsValue = try? self._transformer._apply(from: _lhs[keyPath: self._leftKeyPath]) as? RValue else {
-                return
+                return _rhs
             }
             _rhs[keyPath: self._realRighKeyPath] = transformedRhsValue
+            return _rhs
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {
@@ -234,7 +240,7 @@ extension PropertyMapping {
             self._transformer = transformer
         }
 
-        public func adapt(to lhs: Any, from rhs: Any) {
+        public func adapt(to lhs: Any, from rhs: Any) -> Any {
             var _lhs = lhs as! L
             let _rhs = rhs as! R
             // assigning optional to optional is always possible
@@ -242,21 +248,23 @@ extension PropertyMapping {
             // transform rhs to make an lhs
             guard let transformedLhsValue = try?  self._transformer._adapt(from: _rhsValue) as? LValue else {
                 // failed transformation, don't touch
-                return
+                return _lhs
             }
             _lhs[keyPath: self._realLeftKeyPath] = transformedLhsValue
+            return _lhs
         }
         
-        public func apply(from lhs: Any, to rhs:  Any) {
+        public func apply(from lhs: Any, to rhs:  Any) -> Any {
             let _lhs = lhs as! L
             var _rhs = rhs as! R
             // assigning optional to optional is always possible
             let lhsValue = _lhs[keyPath: self._realLeftKeyPath] ?? LValue()
             guard let transformedRhsValue = try? self._transformer._apply(from: lhsValue) as? RValue else {
                 // failed transformation, don't touch
-                return
+                return _rhs
             }
             _rhs[keyPath: self._realRighKeyPath] = transformedRhsValue
+            return _rhs
         }
         
         public func differs(_ lhs: Any, _ rhs: Any) -> Bool {

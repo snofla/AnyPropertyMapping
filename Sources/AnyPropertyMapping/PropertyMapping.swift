@@ -244,14 +244,14 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
 
 extension PropertyMapping {
     
-    public func adapt(to lhs: Any, from rhs: Any) {
+    public func adapt(to lhs: Any, from rhs: Any) -> Any {
         PropertyMapping.testArguments(#function, lhs, rhs)
-        self.boxedImpl.adapt(to: lhs, from: rhs)
+        return self.boxedImpl.adapt(to: lhs, from: rhs)
     }
     
-    public func apply(from lhs: Any, to rhs: Any) {
+    public func apply(from lhs: Any, to rhs: Any) -> Any {
         PropertyMapping.testArguments(#function, lhs, rhs)
-        self.boxedImpl.apply(from: lhs, to: rhs)
+        return self.boxedImpl.apply(from: lhs, to: rhs)
     }
     
     public func differs(_ lhs: Any, _ rhs: Any) -> Bool {

@@ -13,11 +13,13 @@ public protocol AnyPropertyMapping {
     
     /// Adapts mapping from right-hand side argument to left-hand side argument. The type of
     /// both arguments is defined by the conforming classes.
-    func adapt(to lhs: Any, from rhs: Any)
+    @discardableResult
+    func adapt(to lhs: Any, from rhs: Any) -> Any
     
     /// Applies mapping from left-hand side argument to right-hand side argument. The type of
     /// both arguments is defined by the conforming classes.
-    func apply(from lhs: Any, to rhs: Any)
+    @discardableResult
+    func apply(from lhs: Any, to rhs: Any) -> Any
     
     /// Checks if left-hand and righ-hand side arguments are different. The type of
     /// both arguments is defined by the conforming classes.
