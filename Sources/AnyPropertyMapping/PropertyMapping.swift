@@ -237,7 +237,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
     ///   - lhs: Object's keypath
     ///
     /// - Remark:
-    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
+    /// Available only for Swift 5.3, Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
     ///
     /// Example:
     /// ```
@@ -266,7 +266,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
     /// - Parameters:
     ///   - lhs: Object's keypath
     /// - Remark:
-    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
+    /// Available only for Swift 5.3, Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
     ///
     /// Example:
     /// ```
