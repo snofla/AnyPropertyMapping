@@ -237,7 +237,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
     ///   - lhs: Object's keypath
     ///
     /// - Remark:
-    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
+    /// Available only for Swift 5.3, Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
     ///
     /// Example:
     /// ```
@@ -251,7 +251,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
     ///     PropertyMapping(\LHS.double),
     /// ]
     /// ````
-    #if (swift(>=5.4) && swift(<5.5)) || swift(>=5.6)
+    #if (swift(>=5.3) && swift(<5.5)) || swift(>=5.6)
     public init<LV>(_ lhs: WritableKeyPath<L, LV>) where LV: Equatable, R == L {
         self.boxedImpl = _PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: lhs)
     }
@@ -266,7 +266,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
     /// - Parameters:
     ///   - lhs: Object's keypath
     /// - Remark:
-    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
+    /// Available only for Swift 5.3, Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
     ///
     /// Example:
     /// ```
@@ -280,7 +280,7 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
     ///     PropertyMapping(\LHS.int),
     /// ]
     /// ````
-    #if (swift(>=5.4) && swift(<5.5)) || swift(>=5.6)
+    #if (swift(>=5.3) && swift(<5.5)) || swift(>=5.6)
     public init<LV>(_ lhs: WritableKeyPath<L, LV?>) where LV: (Equatable & DefaultConstructable), R == L {
         self.boxedImpl = _PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: lhs)
     }

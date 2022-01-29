@@ -22,9 +22,6 @@ public extension PropertyMapping where L == R {
     /// - Parameters:
     ///   - lhs: Object's keypath
     ///
-    /// - Remark:
-    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
-    ///
     /// Example:
     /// ```
     /// class LHS {
@@ -49,8 +46,6 @@ public extension PropertyMapping where L == R {
     ///
     /// - Parameters:
     ///   - lhs: Object's keypath
-    /// - Remark:
-    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
     ///
     /// Example:
     /// ```
