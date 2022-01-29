@@ -228,6 +228,64 @@ public final class PropertyMapping<L: AnyObject, R: AnyObject>: AnyPropertyMappi
         self.boxedImpl = _PropertyMappingTransformerBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: rhs, transformer: transformer)
     }
     
+    /// Constructs a mapping between two instances of the same object. This is useful for selectively "copying"
+    /// fields between two instances. Depending on the type of the value the keypath is referring to an actual
+    /// copy is created (value types), or a reference is stored (class types).
+    /// The keypath refers to non-optional properties.
+    ///
+    /// - Parameters:
+    ///   - lhs: Object's keypath
+    ///
+    /// - Remark:
+    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int?
+    ///     var double: Double
+    /// }
+    ///
+    /// // will only copy the `double` property when mapping is used.
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(\LHS.double),
+    /// ]
+    /// ````
+    #if (swift(>=5.4) && swift(<5.5)) || swift(>=5.6)
+    public init<LV>(_ lhs: WritableKeyPath<L, LV>) where LV: Equatable, R == L {
+        self.boxedImpl = _PropertyMappingBoxAsIs(leftKeyPath: lhs, rightKeyPath: lhs)
+    }
+    #endif
+    
+    
+    /// Constructs a mapping between two instances of the same object. This is useful for selectively "copying"
+    /// fields between two instances. Depending on the type of the value the keypath is referring to an actual
+    /// copy is created (value types), or a reference is stored (class types).
+    /// The keypath refers to optional properties.
+    ///
+    /// - Parameters:
+    ///   - lhs: Object's keypath
+    /// - Remark:
+    /// Available only for Swift 5.4, and Swift 5.6+. For Swift 5.5 see: https://bugs.swift.org/browse/SR-15706
+    ///
+    /// Example:
+    /// ```
+    /// class LHS {
+    ///     var int: Int?
+    ///     var double: Double
+    /// }
+    ///
+    /// // will only copy the `int` property when mapping is used.
+    /// let mapping: [AnyPropertyMapping] = [
+    ///     PropertyMapping(\LHS.int),
+    /// ]
+    /// ````
+    #if (swift(>=5.4) && swift(<5.5)) || swift(>=5.6)
+    public init<LV>(_ lhs: WritableKeyPath<L, LV?>) where LV: (Equatable & DefaultConstructable), R == L {
+        self.boxedImpl = _PropertyMappingBoxOptionalBoth(leftKeyPath: lhs, rightKeyPath: lhs)
+    }
+    #endif
+    
     /// Left-hand side keypath
     public var leftKeyPath: AnyKeyPath {
         return self.boxedImpl.leftKeyPath

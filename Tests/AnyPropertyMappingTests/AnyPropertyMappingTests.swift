@@ -379,5 +379,50 @@ class AnyPropertyMappingTests: XCTestCase {
         XCTAssert(defaultEqualityMappingForA.differs(aAB, aBA) == false, "[A] == [A]'")
     }
     
-
+    func test_Mapping_Same_Object() {
+        class A {
+            init(int: Int = 0, double: Double? = nil) {
+                self.int = int
+                self.double = double
+            }
+            var int: Int = 0
+            var double: Double? = 1
+        }
+        // non-optional
+        let mapping1: [AnyPropertyMapping] = [
+            PropertyMapping(\A.int)
+        ]
+        // optional
+        let mapping2: [AnyPropertyMapping] = [
+            PropertyMapping(\A.double)
+        ]
+        var a1 = A()
+        var a2 = A(int: 4, double: 2)
+        // adapt
+        mapping1.adapt(to: a1, from: a2)
+        XCTAssertTrue(a1.int == a2.int)
+        XCTAssertTrue(a1.double != a2.double)
+        a1 = A()
+        a2 = A(int: 4, double: 2)
+        mapping2.adapt(to: a1, from: a2)
+        XCTAssertTrue(a1.int != a2.int)
+        XCTAssertTrue(a1.double == a2.double)
+        // apply
+        a2 = A(int: #line, double: Double(#line))
+        mapping1.apply(from: a1, to: a2)
+        XCTAssertTrue(a1.int == a2.int && a1.double != a2.double)
+        a2 = A(int: #line, double: Double(#line))
+        mapping2.apply(from: a1, to: a2)
+        XCTAssertTrue(a1.int != a2.int && a1.double == a2.double)
+        // check nils
+        a1 = A(int: 0, double: 1)
+        a2 = A(int: 0, double: nil)
+        mapping2.adapt(to: a1, from: a2)
+        XCTAssertTrue(a1.double == a2.double && a1.double == nil)
+        a1 = A(int: 0, double: nil)
+        a2 = A(int: 0, double: 1)
+        mapping2.apply(from: a1, to: a2)
+        XCTAssertTrue(a1.double == a2.double && a1.double == nil)
+    }
+    
 }
